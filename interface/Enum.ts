@@ -47,7 +47,8 @@ export enum OtherEmbedModel {
 }
 
 export enum GLMEmbedModel {
-    EMBED_2 = 'embedding-2'
+    EMBED_2 = 'embedding-2',
+    EMBED_3 = 'embedding-3'
 }
 
 export enum GoogleEmbedModel {

@@ -48,6 +48,7 @@ export interface ChatOption {
 export interface EmbedOption {
     provider?: EmbedModelProvider
     model?: EmbedModel
+    dimensions?: number
 }
 
 export type ModelList = Provider[]

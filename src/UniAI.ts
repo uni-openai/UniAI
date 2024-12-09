@@ -158,11 +158,12 @@ export default class UniAI {
 
         if (provider === EmbedModelProvider.OpenAI)
             return await this.openai.embedding(content, model as OpenAIEmbedModel)
-        else if (provider === EmbedModelProvider.Other)
-            return await this.other.embedding(content, model as OtherEmbedModel)
-        else if (provider === EmbedModelProvider.GLM) return await this.glm.embedding(content, model as GLMEmbedModel)
+        else if (provider === EmbedModelProvider.GLM)
+            return await this.glm.embedding(content, model as GLMEmbedModel, option.dimensions)
         else if (provider === EmbedModelProvider.Google)
             return await this.google.embedding(content, model as GoogleEmbedModel)
+        else if (provider === EmbedModelProvider.Other)
+            return await this.other.embedding(content, model as OtherEmbedModel)
         else throw new Error('Embedding model provider not found')
     }
 

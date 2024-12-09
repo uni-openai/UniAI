@@ -33,13 +33,6 @@ export default class Other {
         if (!this.api) throw new Error('Other embed model API is not set in config')
 
         const res = await $.post<OtherEmbedRequest, OtherEmbedResponse>(`${this.api}/embedding`, { prompt, model })
-        const data: EmbeddingResponse = {
-            embedding: res.data,
-            model,
-            object: 'embedding',
-            promptTokens: 0,
-            totalTokens: 0
-        }
-        return data
+        return { embedding: res.data, model, object: 'embedding', promptTokens: 0, totalTokens: 0 } as EmbeddingResponse
     }
 }

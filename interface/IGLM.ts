@@ -18,7 +18,8 @@ export interface GLMChatRequest {
 }
 export interface GLMEmbedRequest {
     model: GLMEmbedModel
-    input: string
+    input: string | string[]
+    dimensions?: number
 }
 
 export interface GLMEmbedResponse {

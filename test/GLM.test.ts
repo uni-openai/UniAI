@@ -174,4 +174,18 @@ describe('GLM Tests', () => {
             .catch(console.error)
             .finally(done)
     })
+
+    test('Test GLM/embedding-3 embedding', done => {
+        uni.embedding([input, input + 'sss'], {
+            provider: EmbedModelProvider.GLM,
+            model: GLMEmbedModel.EMBED_3,
+            dimensions: 768
+        })
+            .then(res => {
+                expect(res.embedding.length).toBe(2)
+                expect(res.embedding[0].length).toBe(768)
+            })
+            .catch(console.error)
+            .finally(done)
+    })
 })

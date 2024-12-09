@@ -39,27 +39,22 @@ export default class GLM {
      * @param model - The model to use for embeddings (default: text-embedding-ada-002).
      * @returns A promise resolving to the embedding response.
      */
-    async embedding(input: string[], model: GLMEmbedModel = GLMEmbedModel.EMBED_2) {
+    async embedding(input: string[], model: GLMEmbedModel = GLMEmbedModel.EMBED_2, dimensions = 1024) {
         const url = `${this.proxyAPI || API}/api/paas/v4/embeddings`
         const headers = new AxiosHeaders()
         const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
         if (!key) throw new Error('ZhiPu GLM API key is not set in config')
         headers['Authorization'] = this.generateToken(key)
 
-        // simulate array input strings, GLM only support one input string
-        const request: Promise<GLMEmbedResponse>[] = []
-        for (const item of input)
-            request.push($.post<GLMEmbedRequest, GLMEmbedResponse>(url, { model, input: item }, { headers }))
-        const res = await Promise.all(request)
+        const res = await $.post<GLMEmbedRequest, GLMEmbedResponse>(url, { model, input, dimensions }, { headers })
 
-        const data: EmbeddingResponse = {
-            embedding: res.map(v => v.data[0].embedding),
+        return {
+            embedding: res.data.map(v => v.embedding),
             object: 'embedding',
             model,
-            promptTokens: res.reduce((acc, cur) => acc + (cur.usage.prompt_tokens || 0), 0),
-            totalTokens: res.reduce((acc, cur) => acc + (cur.usage.total_tokens || 0), 0)
-        }
-        return data
+            promptTokens: res.usage.prompt_tokens,
+            totalTokens: res.usage.total_tokens
+        } as EmbeddingResponse
     }
 
     /**
