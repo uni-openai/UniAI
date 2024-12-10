@@ -9,6 +9,7 @@ declare global {
             GOOGLE_AI_KEY: string
             ZHIPU_AI_API: string
             ZHIPU_AI_KEY: string
+            FLY_API_PASS: string
             FLY_APP_ID: string
             FLY_API_KEY: string
             FLY_API_SECRET: string

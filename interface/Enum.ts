@@ -64,8 +64,8 @@ export enum OpenAIChatModel {
     GPT_4O = 'gpt-4o',
     CHAT_GPT_4O = 'chatgpt-4o-latest',
     GPT_4O_MINI = 'gpt-4o-mini',
-    // O1_PREV = 'o1-preview',
-    // O1_MINI = 'o1-mini',
+    O1_PRE = 'o1-preview',
+    O1_MINI = 'o1-mini',
     GPT4_TURBO = 'gpt-4-turbo',
     GPT4 = 'gpt-4'
 }
@@ -93,45 +93,37 @@ export enum GLMChatModel {
     GLM_4_PLUS = 'glm-4-plus'
 }
 
-// https://cloud.baidu.com/doc/WENXINWORKSHOP/s/clntwmv7t
+// https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Fm2vrveyu
 export enum BaiduChatModel {
-    ERNIE_3_5 = 'completions', // ERNIE-3.5-8K
-    ERNIE_3_5_PRE = 'ernie-3.5-8k-preview', // ERNIE-3.5-8K
-    ERNIE_3_5_128K = 'ernie-3.5-128k', // ERNIE-3.5-128K
-    ERNIE_4 = 'ernie-4.0-8k-latest', // ERNIE 4.0 8K latest
-    ERNIE_4_TURBO = 'ernie-4.0-turbo-8k', // ERNIE 4.0 8K turbo
-    ERNIE_TINY = 'ernie-tiny-8k', // ERNIE-Tiny-8K
-    ERNIE_LITE = 'ernie-lite-8k', // ERNIE-Lite-8K
-    ERNIE_LITE_PRO_128K = 'ernie-lite-pro-128k', // ERNIE-Lite-RRO-8K
-    ERNIE_SPEED = 'ernie_speed', // ERNIE-Speed-8K
-    ERNIE_SPEED_128K = 'ernie-speed-128k', // ERNIE-Speed-128K
-    ERNIE_SPEED_PRO_128K = 'ernie-speed-pro-128', // ERNIE-Speed-Pro-128K
-    ERNIE_NOVEL = 'ernie-novel-8k', // ERNIE-Novel-8K
-    ERNIE_CHAR = 'ernie-char-8k', // ERNIE-Character-8K-0321
-    QIANFAN_DYN = 'qianfan-dynamic-8k' // Qianfan-Dynamic-8k
+    ERNIE_3_5 = 'completions', // 'ernie-3.5-8k', // ERNIE 3.5 8K
+    ERNIE_3_5_PRE = 'ernie-3.5-8k-preview', // ERNIE 3.5 8K Preview
+    ERNIE_3_5_128K = 'ernie-3.5-128k', // ERNIE 3.5 128K
+    ERNIE_4_0_LATEST = 'ernie-4.0-8k-latest', // ERNIE 4.0 8K Latest
+    ERNIE_4_0_PREVIEW = 'ernie-4.0-8k-preview', // ERNIE 4.0 8K Preview
+    ERNIE_4_0_8K = 'completions_pro', // 'ernie-4.0-8k', // ERNIE 4.0 8K
+    ERNIE_4_0_TURBO_LATEST = 'ernie-4.0-turbo-8k-latest', // ERNIE 4.0 Turbo 8K Latest
+    ERNIE_4_0_TURBO_PREVIEW = 'ernie-4.0-turbo-8k-preview', // ERNIE 4.0 Turbo 8K Preview
+    ERNIE_4_0_TURBO_8K = 'ernie-4.0-turbo-8k', // ERNIE 4.0 Turbo 8K
+    ERNIE_4_0_TURBO_128K = 'ernie-4.0-turbo-128k', // ERNIE 4.0 Turbo 128K
+    ERNIE_SPEED_8K = 'ernie_speed', // ERNIE Speed 8K
+    ERNIE_SPEED_128K = 'ernie-speed-128k', // ERNIE Speed 128K
+    ERNIE_SPEED_PRO_128K = 'ernie-speed-pro-128k', // ERNIE Speed Pro 128K
+    ERNIE_LITE_8K = 'ernie-lite-8k', // ERNIE Lite 8K
+    ERNIE_LITE_PRO_128K = 'ernie-lite-pro-128k', // ERNIE Lite Pro 128K
+    ERNIE_TINY_8K = 'ernie-tiny-8k', // ERNIE Tiny 8K
+    ERNIE_CHAR_8K = 'ernie-char-8k', // ERNIE Character 8K
+    ERNIE_CHAR_FICTION_8K = 'ernie-char-fiction-8k', // ERNIE Character Fiction 8K
+    ERNIE_NOVEL_8K = 'ernie-novel-8k' // ERNIE Novel 8K
 }
 
 // iFlyTek spark model
 export enum IFlyTekChatModel {
     SPARK_LITE = 'lite',
-    SPARK_PRO = 'pro',
-    SPARK_MAX = 'max',
-    SPARK_ULTRA = 'ultra'
-}
-
-// iFlyTek spark model version
-export const IFlyTekModelVersion = {
-    [IFlyTekChatModel.SPARK_LITE]: 'v1.1',
-    [IFlyTekChatModel.SPARK_PRO]: 'v3.1',
-    [IFlyTekChatModel.SPARK_MAX]: 'v3.5',
-    [IFlyTekChatModel.SPARK_ULTRA]: 'v4.0'
-}
-
-export const SparkDomain = {
-    [IFlyTekChatModel.SPARK_LITE]: 'general',
-    [IFlyTekChatModel.SPARK_PRO]: 'generalv3',
-    [IFlyTekChatModel.SPARK_MAX]: 'generalv3.5',
-    [IFlyTekChatModel.SPARK_ULTRA]: '4.0Ultra'
+    SPARK_PRO = 'generalv3',
+    SPARK_PRO_128K = 'pro-128k',
+    SPARK_MAX = 'generalv3.5',
+    SPARK_MAX_32K = 'max-32k',
+    SPARK_ULTRA = '4.0Ultra'
 }
 
 export enum MoonShotChatModel {

@@ -1,9 +1,11 @@
+<!-- @format -->
+
 <p align="center"><img src="./icon/logo.png" width="66px"></p>
 <h1 align="center">UniAI</h1>
 <h3 align="center">To Unify AI Models!</h3>
 
 <p>
-UniAI, built on Node.js, serves as an integrated AI model library. It provides a unified interface for various models, streamlining the development process by ensuring a consistent model input and output.
+UniAI is a library integrated with multiple generative-AI models. It provides a unified interface for different models, streamlining the development process by ensuring a consistent model input and output.
 </p>
 
 <h3 align=center>Chat</h3>
@@ -61,6 +63,8 @@ English · [🇨🇳 中文说明](./README_CN.md)
 <img src="./icon/moon.png" width="45px">
 </p>
 
+Latest update: we have supported **OpenAI's O1** models!
+
 -   [IFLYTEK/Spark](https://xinghuo.xfyun.cn)
 -   [THUDM/ChatGLM-6B](https://github.com/THUDM/ChatGLM4)
 -   [ZHIPU/GLM3-4](https://open.bigmodel.cn)
@@ -69,10 +73,9 @@ English · [🇨🇳 中文说明](./README_CN.md)
 -   [Google/Gemini](https://makersuite.google.com/app/)
 -   [MoonShot/moonshot](https://platform.moonshot.cn/docs)
 -   [OpenAI/DALL-E](https://platform.openai.com)
--   [MidJourney](https://github.com/novicezk/midjourney-proxy)
+-   [AliYun/QianWen](https://help.aliyun.com/zh/model-studio)
+-   [MidJourney Proxy](https://github.com/novicezk/midjourney-proxy)
 -   [Stability AI](https://platform.stability.ai/docs/getting-started)
--   [Stable Diffusion](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
--   [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)
 
 ## Applications Developed on UniAI
 
@@ -134,30 +137,17 @@ console.log(ai.models)
     {
         "provider": "OpenAI",
         "value": "openai",
-        "models": [
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-16k",
-            "gpt-4",
-            "gpt-4-32k",
-            "gpt-4-1106-preview",
-            "gpt-4-vision-preview"
-        ]
-    },
-    // ...providers and models
-    {
-        "provider": "StabilityAI",
-        "value": "stability.ai",
-        "models": ["stable-diffusion-v1-6", "stable-diffusion-xl-1024-v1-0"]
+        "models": ["gpt-3.5-turbo", "gpt-4o", "chatgpt-4o-latest", "gpt-4o-mini", "gpt-4-turbo", "gpt-4"]
     }
+    // ...providers and models
 ]
 ```
 
 ### Chat
 
-To interact with a model, use `.chat()` and remember to provide the required API key or secret parameters when initializing `new UniAI()`.
+To interact with a model, use `.chat()` and remember to provide the **required API key** or **secret** parameters when initializing `new UniAI()`.
 
-Default model is OpenAI/gpt-3.5-turbo, put the OpenAI key and your proxy API.
+Default model is **OpenAI/gpt-3.5-turbo**, put the _OpenAI key_ and your _proxy API_.
 
 ```typescript
 const key: string | string[] = 'Your OpenAI Key (required), support multi keys'

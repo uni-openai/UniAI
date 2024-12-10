@@ -5,7 +5,7 @@ import UniAI, { ChatMessage } from '../src'
 import { ModelProvider, IFlyTekChatModel, ChatModelProvider, ChatRoleEnum } from '../interface/Enum'
 import { Readable } from 'stream'
 
-const { FLY_API_KEY, FLY_API_SECRET, FLY_APP_ID } = process.env
+const { FLY_API_PASS } = process.env
 
 const input: ChatMessage[] = [
     {
@@ -40,7 +40,7 @@ const input: ChatMessage[] = [
 
 let uni: UniAI
 
-beforeAll(() => (uni = new UniAI({ IFlyTek: { apiKey: FLY_API_KEY, appId: FLY_APP_ID, apiSecret: FLY_API_SECRET } })))
+beforeAll(() => (uni = new UniAI({ IFlyTek: { apiPassword: FLY_API_PASS } })))
 
 describe('IFlyTek Tests', () => {
     test('Test list IFlyTek models', () => {

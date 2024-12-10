@@ -28,26 +28,44 @@ describe('Baidu Tests', () => {
             .finally(done)
     })
 
+    test('Test chat Baidu ernie3 preview', done => {
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_3_5_PRE })
+            .then(console.log)
+            .finally(done)
+    })
+
     test('Test chat Baidu ernie3 128k', done => {
         uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_3_5_128K })
             .then(console.log)
             .finally(done)
     })
 
-    test('Test chat Baidu ernie4', done => {
-        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4 })
+    test('Test chat Baidu ernie4 8k', done => {
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4_0_8K })
+            .then(console.log)
+            .finally(done)
+    })
+
+    test('Test chat Baidu ernie4 latest', done => {
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4_0_LATEST })
+            .then(console.log)
+            .finally(done)
+    })
+
+    test('Test chat Baidu ernie4 preview', done => {
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4_0_PREVIEW })
             .then(console.log)
             .finally(done)
     })
 
     test('Test chat Baidu ernie4 turbo', done => {
-        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4_TURBO })
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_4_0_TURBO_LATEST })
             .then(console.log)
             .finally(done)
     })
 
     test('Test chat Baidu ernie tiny stream', done => {
-        uni.chat(input, { stream: true, provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_TINY }).then(
+        uni.chat(input, { stream: true, provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_TINY_8K }).then(
             res => {
                 expect(res).toBeInstanceOf(Readable)
                 const stream = res as Readable
@@ -61,7 +79,7 @@ describe('Baidu Tests', () => {
     })
 
     test('Test chat Baidu ernie lite stream', done => {
-        uni.chat(input, { stream: true, provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_LITE }).then(
+        uni.chat(input, { stream: true, provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_LITE_8K }).then(
             res => {
                 expect(res).toBeInstanceOf(Readable)
                 const stream = res as Readable
@@ -81,7 +99,7 @@ describe('Baidu Tests', () => {
     })
 
     test('Test chat Baidu ernie speed', done => {
-        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_SPEED })
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_SPEED_8K })
             .then(console.log)
             .finally(done)
     })
@@ -99,7 +117,7 @@ describe('Baidu Tests', () => {
     })
 
     test('Test chat Baidu ernie novel', done => {
-        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_NOVEL })
+        uni.chat(input, { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_NOVEL_8K })
             .then(console.log)
             .finally(done)
     })
@@ -116,10 +134,7 @@ describe('Baidu Tests', () => {
                     content: '你好，who are U? Bro'
                 }
             ],
-            {
-                provider: ChatModelProvider.Baidu,
-                model: BaiduChatModel.ERNIE_CHAR
-            }
+            { provider: ChatModelProvider.Baidu, model: BaiduChatModel.ERNIE_CHAR_8K }
         )
             .then(console.log)
             .finally(done)
@@ -139,7 +154,7 @@ describe('Baidu Tests', () => {
             ],
             {
                 provider: ChatModelProvider.Baidu,
-                model: BaiduChatModel.QIANFAN_DYN
+                model: BaiduChatModel.ERNIE_CHAR_FICTION_8K
             }
         )
             .then(console.log)

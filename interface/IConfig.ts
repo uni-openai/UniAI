@@ -22,16 +22,17 @@ export interface UniAIConfig {
 
     // IFlyTek
     IFlyTek?: {
-        appId: string
-        apiKey: string
-        apiSecret: string
+        apiPassword?: string | string[]
+        appId?: string
+        apiKey?: string
+        apiSecret?: string
         proxy?: string
     }
 
     Baidu?: {
         appId?: string
-        apiKey: string
-        secretKey: string
+        apiKey?: string
+        secretKey?: string
         proxy?: string
     }
 

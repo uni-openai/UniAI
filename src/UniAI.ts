@@ -67,7 +67,13 @@ export default class UniAI {
         // Google AI key, your Google AI API proxy (optional)
         this.google = new Google(config.Google?.key, config.Google?.proxy)
         // IFlyTek appid, API key, API secret
-        this.fly = new IFlyTek(config.IFlyTek?.appId, config.IFlyTek?.apiKey, config.IFlyTek?.apiSecret)
+        this.fly = new IFlyTek(
+            config.IFlyTek?.apiPassword,
+            config.IFlyTek?.appId,
+            config.IFlyTek?.apiKey,
+            config.IFlyTek?.apiSecret,
+            config.IFlyTek?.proxy
+        )
         // Baidu WenXin Workshop, baidu api key, baidu secret key
         this.baidu = new Baidu(config.Baidu?.apiKey, config.Baidu?.secretKey, config.Baidu?.proxy)
         // MoonShot, moonshot API key

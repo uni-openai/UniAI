@@ -108,21 +108,19 @@ describe('OpenAI Tests', () => {
         )
     }, 60000)
 
-    /*
     test('Test chat openai o1-preview', done => {
-        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PREV })
+        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PRE })
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    })
+    }, 60000)
 
     test('Test chat openai o1-mini', done => {
         uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_MINI })
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    })
-    */
+    }, 60000)
 
     test('Test OpenAI/text-embedding-ada2 embedding', done => {
         uni.embedding(input, { provider: EmbedModelProvider.OpenAI, model: OpenAIEmbedModel.ADA })
