@@ -74,7 +74,9 @@ export enum OpenAIChatModel {
 export enum GoogleChatModel {
     GEM_PRO_1_5 = 'gemini-1.5-pro',
     GEM_FLASH_1_5 = 'gemini-1.5-flash',
-    GEM_PRO_1 = 'gemini-1.0-pro'
+    GEM_FLASH_1_5_8B = 'gemini-1.5-flash-8b',
+    GEM_FLASH_2_EXP = 'gemini-2.0-flash-exp',
+    GEM_FLASH_2_THINK_EXP = 'gemini-2.0-flash-thinking-exp'
 }
 
 // glm chat models

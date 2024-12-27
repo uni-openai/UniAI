@@ -6,11 +6,16 @@ export interface GEMChatRequest {
     contents: GEMChatMessage[]
     safetySettings?: SafetySetting[]
     generationConfig?: GenerationConfig
+    system_instruction?: GemSystemInstruction
 }
 
 export interface GEMChatMessage {
     role: GEMChatRoleEnum
     parts: Part[]
+}
+
+export interface GemSystemInstruction {
+    parts: Part
 }
 
 export interface GoogleEmbedRequest {

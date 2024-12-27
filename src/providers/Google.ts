@@ -88,9 +88,6 @@ export default class Google {
         temperature?: number,
         maxLength?: number
     ) {
-        if (![GoogleChatModel.GEM_PRO_1_5, GoogleChatModel.GEM_FLASH_1_5].includes(model))
-            messages = messages.map(({ role, content }) => ({ role, content }))
-
         const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
         if (!key) throw new Error('Google AI API key is not set in config')
 
@@ -109,6 +106,14 @@ export default class Google {
             `${this.api}/v1beta/models/${model}:${stream ? 'streamGenerateContent' : 'generateContent'}?key=${key}`,
             {
                 contents: await this.formatMessage(messages),
+                system_instruction: {
+                    parts: {
+                        text: messages
+                            .filter(v => v.role === ChatRoleEnum.SYSTEM)
+                            .map(v => v.content)
+                            .join('\n')
+                    }
+                },
                 generationConfig: { topP: top, temperature, maxOutputTokens: maxLength },
                 safetySettings: SAFE_SET
             },
@@ -170,7 +175,9 @@ export default class Google {
 
         for (const { role, content, img } of messages) {
             if (!content) continue
+            if (role === ChatRoleEnum.SYSTEM) continue
             if (img) base64 = await this.toBase64(img)
+
             if (role !== ChatRoleEnum.ASSISTANT) input += `\n${content}`
             else {
                 input = input.trim()
