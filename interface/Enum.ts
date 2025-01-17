@@ -9,7 +9,8 @@ export enum ChatModelProvider {
     Google = 'google',
     GLM = 'glm',
     MoonShot = 'moonshot',
-    AliYun = 'aliyun'
+    AliYun = 'aliyun',
+    Other = 'other'
 }
 
 export enum EmbedModelProvider {
@@ -64,6 +65,7 @@ export enum OpenAIChatModel {
     GPT_4O = 'gpt-4o',
     CHAT_GPT_4O = 'chatgpt-4o-latest',
     GPT_4O_MINI = 'gpt-4o-mini',
+    O1 = 'o1',
     O1_PRE = 'o1-preview',
     O1_MINI = 'o1-mini',
     GPT4_TURBO = 'gpt-4-turbo',
@@ -224,7 +226,8 @@ export enum ChatRoleEnum {
     SYSTEM = 'system',
     USER = 'user',
     ASSISTANT = 'assistant',
-    FUNCTION = 'function'
+    TOOL = 'tool',
+    DEV = 'developer'
 }
 
 // OpenAI GPT model roles

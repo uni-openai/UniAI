@@ -118,7 +118,7 @@ export default class MoonShot {
         const prompt: GPTChatMessage[] = []
 
         for (const { role, content } of messages) {
-            if (role === ChatRoleEnum.FUNCTION) continue
+            if (role === ChatRoleEnum.TOOL || role === ChatRoleEnum.DEV) continue
 
             prompt.push({ role, content })
         }

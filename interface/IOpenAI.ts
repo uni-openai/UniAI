@@ -12,7 +12,8 @@ import {
     ChatCompletionSystemMessageParam,
     ChatCompletionUserMessageParam,
     ChatCompletionAssistantMessageParam,
-    ChatCompletionToolMessageParam
+    ChatCompletionToolMessageParam,
+    ChatCompletionDeveloperMessageParam
 } from 'openai/resources'
 
 export interface GPTChatResponse extends ChatCompletion {}
@@ -33,5 +34,6 @@ export type GPTChatMessage =
     | ChatCompletionUserMessageParam
     | ChatCompletionAssistantMessageParam
     | ChatCompletionToolMessageParam
+    | ChatCompletionDeveloperMessageParam
 
 export type GPTImagineSize = '256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792' | null

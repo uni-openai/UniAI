@@ -66,6 +66,7 @@ export interface UniAIConfig {
     // other models
     Other?: {
         api?: string
+        key?: string
         // ...
     }
 }

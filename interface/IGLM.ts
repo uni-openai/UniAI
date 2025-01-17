@@ -71,16 +71,9 @@ interface ToolMessage {
     tool_call_id: string
 }
 
-// only for ChatGLM 6B
-interface FunctionMessage {
-    role: 'observation'
-    metadata?: string | null
-    tools?: {}[] | null
-}
+export type GLMChatMessage = SystemMessage | UserMessage | AssistantMessage | ToolMessage
 
-export type GLMChatMessage = SystemMessage | UserMessage | AssistantMessage | ToolMessage | FunctionMessage
-
-interface Tool {
+export interface Tool {
     type: 'function' | 'retrieval' | 'web_search'
     function?: FunctionTool
     retrieval?: RetrievalTool
@@ -116,7 +109,7 @@ export interface GLMChatResponse {
     created: number
     choices: Choice[]
     usage: Usage
-    web_search?: WebSearch
+    web_search?: WebSearch[]
 }
 
 interface Choice {
@@ -132,11 +125,11 @@ interface Message {
     tool_calls?: {
         function: {
             name: string
-            arguments: Object
+            arguments: string
         }
         id: string
         type: 'function'
-    }
+    }[]
 }
 
 interface Usage {

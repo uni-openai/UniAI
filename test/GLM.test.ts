@@ -29,7 +29,7 @@ describe('GLM Tests', () => {
         expect(provider.value).toEqual(ModelProvider.GLM)
     })
 
-    xtest('Test chat local chatglm3-6b', done => {
+    test('Test chat local chatglm3-6b', done => {
         uni.chat(input, { provider: ChatModelProvider.GLM, model: GLMChatModel.GLM_6B })
             .then(console.log)
             .catch(console.error)

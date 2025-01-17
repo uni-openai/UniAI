@@ -133,7 +133,7 @@ export default class AliYun {
 
         for (const { role, content, img } of messages) {
             // GPT not support function role
-            if (role === ChatRoleEnum.FUNCTION) continue
+            if (role === ChatRoleEnum.TOOL || role === ChatRoleEnum.DEV) continue
 
             // with image
             if (img) {

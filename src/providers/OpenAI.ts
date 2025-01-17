@@ -26,6 +26,7 @@ import { ChatRoleEnum, DETaskType, OpenAIChatModel, OpenAIEmbedModel, OpenAIImag
 import { ChatResponse, ChatMessage, TaskResponse, ImagineResponse } from '../../interface/IModel'
 import { EmbeddingResponse } from '../../interface/IModel'
 import $ from '../util'
+import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resources'
 
 const STORAGE_KEY = 'task_open_ai'
 const API = 'https://api.openai.com'
@@ -82,6 +83,8 @@ export default class OpenAI {
      * @param top - Top probability to sample (optional).
      * @param temperature - Temperature for sampling (optional).
      * @param maxLength - Maximum token length for response (optional).
+     * @param tools - Tools for model to use (optional).
+     * @param toolChoice - Controls which (if any) tool is called by the model: none, required, auto (optional).
      * @returns A promise resolving to the chat response or a stream.
      */
     async chat(
@@ -90,7 +93,9 @@ export default class OpenAI {
         stream: boolean = false,
         top?: number,
         temperature?: number,
-        maxLength?: number
+        maxLength?: number,
+        tools?: ChatCompletionTool[],
+        toolChoice?: ChatCompletionToolChoiceOption
     ) {
         // if (!Object.values(OpenAIChatModel).includes(model)) throw new Error('OpenAI chat model not found')
 
@@ -103,7 +108,10 @@ export default class OpenAI {
                 OpenAIChatModel.GPT4_TURBO,
                 OpenAIChatModel.GPT_4O,
                 OpenAIChatModel.GPT_4O_MINI,
-                OpenAIChatModel.CHAT_GPT_4O
+                OpenAIChatModel.CHAT_GPT_4O,
+                OpenAIChatModel.O1,
+                OpenAIChatModel.O1_MINI,
+                OpenAIChatModel.O1_PRE
             ].includes(model)
         )
             messages = messages.map(({ role, content }) => ({ role, content }))
@@ -121,7 +129,16 @@ export default class OpenAI {
 
         const res = await $.post<GPTChatRequest | GPTChatStreamRequest, Readable | GPTChatResponse>(
             `${this.api}/${VER}/chat/completions`,
-            { model, messages: this.formatMessage(messages), stream, temperature, top_p: top, max_tokens: maxLength },
+            {
+                model,
+                messages: this.formatMessage(messages),
+                stream,
+                temperature,
+                top_p: top,
+                max_completion_tokens: maxLength,
+                tools,
+                tool_choice: toolChoice
+            },
             { headers: { Authorization: `Bearer ${key}` }, responseType: stream ? 'stream' : 'json' }
         )
 
@@ -137,16 +154,17 @@ export default class OpenAI {
         if (res instanceof Readable) {
             const output = new PassThrough()
             const parser = new EventSourceStream()
+
             parser.on('data', (e: MessageEvent) => {
                 const obj = $.json<GPTChatStreamResponse>(e.data)
-                if (obj?.choices[0].delta?.content) {
+                if (obj?.choices[0]?.delta?.content) {
                     data.content = obj.choices[0].delta.content
+                    data.tools = obj.choices[0].delta.tool_calls
                     data.model = obj.model
                     data.object = obj.object
                     output.write(JSON.stringify(data))
                 }
             })
-
             parser.on('error', e => output.destroy(e))
             parser.on('end', () => output.end())
 
@@ -154,6 +172,7 @@ export default class OpenAI {
             return output as Readable
         } else {
             data.content = res.choices[0].message.content || ''
+            data.tools = res.choices[0].message.tool_calls
             data.model = res.model
             data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0
@@ -233,23 +252,27 @@ export default class OpenAI {
     private formatMessage(messages: ChatMessage[]) {
         const prompt: GPTChatMessage[] = []
 
-        for (const { role, content, img } of messages) {
-            // GPT not support function role
-            if (role === ChatRoleEnum.FUNCTION) continue
-
+        for (const { role, content, img, tool } of messages) {
             // with image
-            if (img) {
-                if (!img.startsWith('http')) throw new Error('Invalid img HTTP URL')
-                prompt.push({
-                    role: 'user',
-                    content: [
-                        { type: 'text', text: content },
-                        { type: 'image_url', image_url: { url: img } }
-                    ]
-                })
+            switch (role) {
+                case ChatRoleEnum.USER:
+                    if (img)
+                        prompt.push({
+                            role,
+                            content: [
+                                { type: 'text', text: content },
+                                { type: 'image_url', image_url: { url: img } }
+                            ]
+                        })
+                    else prompt.push({ role, content })
+                    break
+                case ChatRoleEnum.TOOL:
+                    prompt.push({ role, content, tool_call_id: tool! })
+                    break
+                default:
+                    prompt.push({ role, content })
+                    break
             }
-            // only text
-            else prompt.push({ role, content })
         }
 
         return prompt

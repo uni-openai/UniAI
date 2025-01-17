@@ -37,6 +37,8 @@ import MoonShot from './providers/MoonShot'
 import MidJourney from './providers/MidJourney'
 import Stability from './providers/Stability'
 import AliYun from './providers/AliYun'
+import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resources'
+import { Tool } from '../interface/IGLM'
 
 const DEFAULT_MESSAGE = 'Hi, who are you? Answer in 10 words!'
 
@@ -81,7 +83,7 @@ export default class UniAI {
         // AliYun, QWen API key
         this.ali = new AliYun(config.AliYun?.key, config.AliYun?.proxy)
         // Other model text2vec
-        this.other = new Other(config.Other?.api)
+        this.other = new Other(config.Other?.api, config.Other?.key)
         // Midjourney, proxy
         this.mj = new MidJourney(config.MidJourney?.proxy, config.MidJourney?.token, config.MidJourney?.imgProxy)
         // Stability AI, key, proxy
@@ -99,7 +101,8 @@ export default class UniAI {
                     [ChatModelProvider.GLM]: GLMChatModel,
                     [ChatModelProvider.Google]: GoogleChatModel,
                     [ChatModelProvider.MoonShot]: MoonShotChatModel,
-                    [ChatModelProvider.AliYun]: AliChatModel
+                    [ChatModelProvider.AliYun]: AliChatModel,
+                    [ChatModelProvider.Other]: []
                 }[v]
             )
         }))
@@ -138,14 +141,32 @@ export default class UniAI {
     async chat(messages: ChatMessage[] | string = DEFAULT_MESSAGE, option: ChatOption = {}) {
         if (typeof messages === 'string') messages = [{ role: ChatRoleEnum.USER, content: messages }]
         const provider = option.provider || ChatModelProvider.OpenAI // default is OpenAI gpt-3.5-turbo
-        const { model, stream, top, temperature, maxLength } = option
+        const { model, stream, top, temperature, maxLength, tools, toolChoice } = option
 
         if (provider === ChatModelProvider.OpenAI)
-            return await this.openai.chat(messages, model as OpenAIChatModel, stream, top, temperature, maxLength)
+            return await this.openai.chat(
+                messages,
+                model as OpenAIChatModel,
+                stream,
+                top,
+                temperature,
+                maxLength,
+                tools as ChatCompletionTool[],
+                toolChoice as ChatCompletionToolChoiceOption
+            )
         else if (provider === ChatModelProvider.Google)
             return await this.google.chat(messages, model as GoogleChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.GLM)
-            return await this.glm.chat(messages, model as GLMChatModel, stream, top, temperature, maxLength)
+            return await this.glm.chat(
+                messages,
+                model as GLMChatModel,
+                stream,
+                top,
+                temperature,
+                maxLength,
+                tools as Tool[],
+                toolChoice as 'auto'
+            )
         else if (provider === ChatModelProvider.IFlyTek)
             return await this.fly.chat(messages, model as IFlyTekChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.Baidu)
@@ -154,6 +175,17 @@ export default class UniAI {
             return await this.moon.chat(messages, model as MoonShotChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.AliYun)
             return await this.ali.chat(messages, model as AliChatModel, stream, top, temperature, maxLength)
+        else if (provider === ChatModelProvider.Other)
+            return await this.other.chat(
+                messages,
+                model as ChatModel,
+                stream,
+                top,
+                temperature,
+                maxLength,
+                tools as ChatCompletionTool[],
+                toolChoice as ChatCompletionToolChoiceOption
+            )
         else throw new Error('Chat model Provider not found')
     }
 

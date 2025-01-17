@@ -1,6 +1,6 @@
 {
     "name": "uniai",
-    "version": "1.9.4",
+    "version": "1.10.1",
     "author": "devilyouwei",
     "description": "To unify AI models!",
     "repository": "https://github.com/uni-openai/uniai",
@@ -63,6 +63,6 @@
         "is-base64": "^1.1.0",
         "jsonwebtoken": "^9.0.2",
         "node-localstorage": "^3.0.5",
-        "openai": "^4.65.0"
+        "openai": "^4.78.1"
     }
 }

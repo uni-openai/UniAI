@@ -210,9 +210,10 @@ export default class IFlyTek {
         const prompt: SPKChatMessage[] = []
 
         for (const { role, content } of messages) {
-            if (role === ChatRoleEnum.FUNCTION) continue
+            if (role === ChatRoleEnum.DEV || role === ChatRoleEnum.TOOL) continue
             prompt.push({ role, content })
         }
+
         return prompt
     }
 }

@@ -10,7 +10,8 @@ import {
     GLMChatResponse,
     GLMEmbedRequest,
     GLMEmbedResponse,
-    GLMTokenCache
+    GLMTokenCache,
+    Tool
 } from '../../interface/IGLM'
 import { ChatRoleEnum, GLMChatModel, GLMEmbedModel } from '../../interface/Enum'
 import { ChatMessage, ChatResponse, EmbeddingResponse } from '../../interface/IModel'
@@ -74,7 +75,9 @@ export default class GLM {
         stream: boolean = false,
         top?: number,
         temperature?: number,
-        maxLength?: number
+        maxLength?: number,
+        tools?: Tool[],
+        toolChoice?: 'auto'
     ) {
         // filter images
         if (![GLMChatModel.GLM_4V, GLMChatModel.GLM_4V_PLUS].includes(model))
@@ -115,7 +118,16 @@ export default class GLM {
 
         const res = await $.post<GLMChatRequest, Readable | GLMChatResponse>(
             url,
-            { model, messages: this.formatMessage(messages), stream, temperature, top_p: top, max_tokens: maxLength },
+            {
+                model,
+                messages: this.formatMessage(messages),
+                stream,
+                temperature,
+                top_p: top,
+                max_tokens: maxLength,
+                tools,
+                tool_choice: toolChoice
+            },
             { headers, responseType: stream ? 'stream' : 'json' }
         )
         if (res instanceof Readable) {
@@ -126,6 +138,7 @@ export default class GLM {
                 const obj = $.json<GLMChatResponse>(e.data)
                 if (obj) {
                     data.content = obj.choices[0].delta?.content || ''
+                    data.tools = obj.choices[0].delta?.tool_calls
                     data.model = obj.model
                     data.object = obj.object || 'chat.completion.chunk'
                     data.promptTokens = obj.usage?.prompt_tokens || 0
@@ -142,6 +155,7 @@ export default class GLM {
             return output as Readable
         } else {
             data.content = res.choices[0].message?.content || ''
+            data.tools = res.choices[0].message?.tool_calls
             data.model = res.model
             data.object = res.object || 'chat.completion'
             data.promptTokens = res.usage?.prompt_tokens || 0
@@ -176,31 +190,41 @@ export default class GLM {
     }
 
     /**
-     * Formats chat messages according to the GLM model's message format.
+     * Formats chat messages according to the GPT model's message format.
      *
      * @param messages - An array of chat messages.
-     * @returns Formatted messages compatible with the GLM model.
+     * @returns Formatted messages compatible with the GPT model.
      */
     private formatMessage(messages: ChatMessage[]) {
         const prompt: GLMChatMessage[] = []
 
-        for (const { role, content, img } of messages) {
-            // GLM not support function role
-            if (role === ChatRoleEnum.FUNCTION) continue
+        for (const { role, content, img, tool } of messages) {
+            if (role === ChatRoleEnum.DEV) continue
 
             // with image
-            if (img) {
-                if (!img.startsWith('http')) throw new Error('Invalid img HTTP URL')
-                prompt.push({
-                    role: 'user',
-                    content: [
-                        { type: 'text', text: content },
-                        { type: 'image_url', image_url: { url: img } }
-                    ]
-                })
+            switch (role) {
+                case ChatRoleEnum.USER:
+                    if (img)
+                        prompt.push({
+                            role,
+                            content: [
+                                { type: 'text', text: content },
+                                { type: 'image_url', image_url: { url: img } }
+                            ]
+                        })
+                    else prompt.push({ role, content })
+                    break
+                case ChatRoleEnum.TOOL:
+                    prompt.push({
+                        role,
+                        content,
+                        tool_call_id: tool || ''
+                    })
+                    break
+                default:
+                    prompt.push({ role, content })
+                    break
             }
-            // only text
-            else prompt.push({ role, content })
         }
 
         return prompt

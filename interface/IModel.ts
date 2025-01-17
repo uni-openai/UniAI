@@ -17,6 +17,7 @@ export interface ChatMessage {
     role: ChatRoleEnum
     content: string
     img?: string // url or base64
+    tool?: string // tool_call_id
 }
 
 export interface EmbeddingResponse {
@@ -34,6 +35,14 @@ export interface ChatResponse {
     totalTokens: number
     model: ChatModel | string
     object: string
+    tools?: {
+        id?: string
+        function?: {
+            arguments?: string
+            name?: string
+        }
+        type?: string
+    }[]
 }
 
 export interface ChatOption {
@@ -43,6 +52,11 @@ export interface ChatOption {
     top?: number
     temperature?: number
     maxLength?: number
+    tools?: {
+        type: string
+        [key: string]: any
+    }[]
+    toolChoice?: string
 }
 
 export interface EmbedOption {

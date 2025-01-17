@@ -14,13 +14,26 @@ import { Readable } from 'stream'
 
 const { OPENAI_KEY, OPENAI_API } = process.env
 
-const input = 'Hi, who are you? Answer in 10 words!'
+const input: string = 'Hi, who are you? Answer in 10 words!'
+const input2: ChatMessage[] = [
+    {
+        role: ChatRoleEnum.USER,
+        content: '描述下这张图片，是个男人还是女人，她在做什么？',
+        img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
+    }
+]
+const input3: ChatMessage[] = [
+    { role: ChatRoleEnum.SYSTEM, content: '你是一个翻译官！翻译中文为英文！' },
+    { role: ChatRoleEnum.USER, content: '你好，你是谁？' },
+    { role: ChatRoleEnum.ASSISTANT, content: 'Hello, who are you?' },
+    { role: ChatRoleEnum.USER, content: '你是一个聪明的模型' }
+]
 
 let uni: UniAI
 
 beforeAll(() => (uni = new UniAI({ OpenAI: { key: OPENAI_KEY.split(','), proxy: OPENAI_API } })))
 
-describe('OpenAI Tests', () => {
+describe('OpenAI tests', () => {
     test('Test list OpenAI models', () => {
         const provider = uni.models.filter(v => v.value === ModelProvider.OpenAI)[0]
         console.log(provider)
@@ -34,68 +47,42 @@ describe('OpenAI Tests', () => {
     })
 
     test('Test chat openai gpt-4o', done => {
-        const input: ChatMessage[] = [
-            {
-                role: ChatRoleEnum.USER,
-                content: '描述下这张图片，是个男人还是女人，她在做什么？',
-                img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
-            }
-        ]
-        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O })
+        uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O })
             .then(console.log)
             .catch(console.error)
             .finally(done)
     }, 60000)
 
     test('Test chat openai gpt-4o-mini', done => {
-        const input: ChatMessage[] = [
-            {
-                role: ChatRoleEnum.USER,
-                content: '描述下这张图片，是个男人还是女人，她在做什么？',
-                img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
-            }
-        ]
-        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O_MINI })
+        uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O_MINI })
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    }, 10000)
+    }, 60000)
 
     test('Test chat openai chatgpt-4o-latest', done => {
-        const input: ChatMessage[] = [
-            {
-                role: ChatRoleEnum.USER,
-                content: '描述下这张图片，是个男人还是女人，她在做什么？',
-                img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
-            }
-        ]
-        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.CHAT_GPT_4O })
+        uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.CHAT_GPT_4O })
             .then(console.log)
             .catch(console.error)
             .finally(done)
     }, 60000)
 
     test('Test chat openai gpt-4 stream', done => {
-        uni.chat(input, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT4 }).then(res => {
-            expect(res).toBeInstanceOf(Readable)
-            const stream = res as Readable
-            let data = ''
-            stream.on('data', chunk => (data += JSON.parse(chunk.toString()).content))
-            stream.on('end', () => console.log(data))
-            stream.on('error', e => console.error(e))
-            stream.on('close', () => done())
-        })
+        uni.chat(input3, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT4 }).then(
+            res => {
+                expect(res).toBeInstanceOf(Readable)
+                const stream = res as Readable
+                let data = ''
+                stream.on('data', chunk => (data += JSON.parse(chunk.toString()).content))
+                stream.on('end', () => console.log(data))
+                stream.on('error', e => console.error(e))
+                stream.on('close', () => done())
+            }
+        )
     })
 
     test('Test chat openai gpt-4 turbo with vision', done => {
-        const input: ChatMessage[] = [
-            {
-                role: ChatRoleEnum.USER,
-                content: '描述下这张图片，是个男人还是女人，她在做什么？',
-                img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
-            }
-        ]
-        uni.chat(input, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT4_TURBO }).then(
+        uni.chat(input2, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT4_TURBO }).then(
             res => {
                 expect(res).toBeInstanceOf(Readable)
                 const stream = res as Readable
@@ -108,12 +95,31 @@ describe('OpenAI Tests', () => {
         )
     }, 60000)
 
+    test('Test chat openai o1', done => {
+        uni.chat(input, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1 }).then(res => {
+            expect(res).toBeInstanceOf(Readable)
+            const stream = res as Readable
+            let data = ''
+            stream.on('data', chunk => (data += JSON.parse(chunk.toString()).content))
+            stream.on('end', () => console.log(data))
+            stream.on('error', e => console.error(e))
+            stream.on('close', () => done())
+        })
+    }, 10000)
+
     test('Test chat openai o1-preview', done => {
-        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PRE })
-            .then(console.log)
-            .catch(console.error)
-            .finally(done)
-    }, 60000)
+        uni.chat(input, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PRE }).then(
+            res => {
+                expect(res).toBeInstanceOf(Readable)
+                const stream = res as Readable
+                let data = ''
+                stream.on('data', chunk => (data += JSON.parse(chunk.toString()).content))
+                stream.on('end', () => console.log(data))
+                stream.on('error', e => console.error(e))
+                stream.on('close', () => done())
+            }
+        )
+    }, 10000)
 
     test('Test chat openai o1-mini', done => {
         uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_MINI })
