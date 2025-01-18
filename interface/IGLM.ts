@@ -98,6 +98,7 @@ interface RetrievalTool {
 interface WebSearchTool {
     enable?: boolean
     search_query?: string
+    search_result?: boolean
 }
 
 // Stream response

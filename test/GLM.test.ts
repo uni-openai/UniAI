@@ -166,6 +166,53 @@ describe('GLM Tests', () => {
         )
     }, 60000)
 
+    test('Test chat ZhiPu glm-4 with tools', done => {
+        const tools = [
+            {
+                type: 'function',
+                function: {
+                    name: 'get_weather',
+                    description: 'Get current temperature for a given location.',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            location: {
+                                type: 'string',
+                                description: 'City and country e.g. Bogotá, Colombia, should in English'
+                            }
+                        },
+                        required: ['location'],
+                        additionalProperties: false
+                    },
+                    strict: true
+                }
+            }
+        ]
+        uni.chat('今天澳门天气如何？', {
+            stream: false,
+            provider: ChatModelProvider.GLM,
+            model: GLMChatModel.GLM_4,
+            tools
+        })
+            .then(r => console.log(JSON.stringify(r)))
+            .catch(console.error)
+            .finally(done)
+    }, 60000)
+
+    test('Test chat ZhiPu glm-4 plus with web search tool', done => {
+        const tools = [{ type: 'web_search', web_search: { enable: true, search_result: true } }]
+        // 只允许访问国内网站
+        uni.chat('总结文中的内容：https://www.chinanews.com.cn/cj/2024/07-05/10246755.shtml', {
+            provider: ChatModelProvider.GLM,
+            model: GLMChatModel.GLM_4_PLUS,
+            tools,
+            toolChoice: 'auto'
+        })
+            .then(console.log)
+            .catch(console.error)
+            .finally(done)
+    }, 60000)
+
     test('Test GLM/embedding-2 embedding', done => {
         uni.embedding([input, input + 'sss'], { provider: EmbedModelProvider.GLM, model: GLMEmbedModel.EMBED_2 })
             .then(res => {

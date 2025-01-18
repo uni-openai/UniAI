@@ -18,8 +18,8 @@ const input: string = 'Hi, who are you? Answer in 10 words!'
 const input2: ChatMessage[] = [
     {
         role: ChatRoleEnum.USER,
-        content: '描述下这张图片，是个男人还是女人，她在做什么？',
-        img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
+        content: '描述下这张图片',
+        img: 'https://img2.baidu.com/it/u=2595743336,2138195985&fm=253&fmt=auto?w=801&h=800'
     }
 ]
 const input3: ChatMessage[] = [
@@ -124,6 +124,39 @@ describe('OpenAI tests', () => {
     test('Test chat openai o1-mini', done => {
         uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_MINI })
             .then(console.log)
+            .catch(console.error)
+            .finally(done)
+    }, 60000)
+
+    test('Test chat openai gpt-4o-mini with tools', done => {
+        const tools = [
+            {
+                type: 'function',
+                function: {
+                    name: 'get_weather',
+                    description: 'Get current temperature for a given location.',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            location: {
+                                type: 'string',
+                                description: 'City and country e.g. Bogotá, Colombia, should in English'
+                            }
+                        },
+                        required: ['location'],
+                        additionalProperties: false
+                    },
+                    strict: true
+                }
+            }
+        ]
+        uni.chat('今天澳门天气如何？', {
+            stream: false,
+            provider: ChatModelProvider.OpenAI,
+            model: OpenAIChatModel.GPT_4O_MINI,
+            tools
+        })
+            .then(r => console.log(JSON.stringify(r)))
             .catch(console.error)
             .finally(done)
     }, 60000)
