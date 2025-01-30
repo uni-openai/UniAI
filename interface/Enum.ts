@@ -83,8 +83,6 @@ export enum GoogleChatModel {
 
 // glm chat models
 export enum GLMChatModel {
-    GLM_6B = 'chatglm3-6b',
-    GLM_9B = 'glm-4-9b-chat',
     GLM_3_TURBO = 'glm-3-turbo',
     GLM_4 = 'glm-4',
     GLM_4_AIR = 'glm-4-air',
@@ -156,6 +154,7 @@ export type ChatModel =
     | GoogleChatModel
     | MoonShotChatModel
     | AliChatModel
+    | string
 
 export const ChatModel = {
     ...OpenAIChatModel,
@@ -235,16 +234,16 @@ export enum GPTChatRoleEnum {
     SYSTEM = 'system',
     USER = 'user',
     ASSISTANT = 'assistant',
-    FUNCTION = 'function',
+    DEV = 'developer',
     TOOL = 'tool'
 }
 
 // IflyTek Spark model roles
 export enum SPKChatRoleEnum {
-    SYSTEM = 'system',
     USER = 'user',
     ASSISTANT = 'assistant',
-    FUNCTION = 'function'
+    SYSTEM = 'system',
+    TOOL = 'tool'
 }
 
 // ChatGLM model roles

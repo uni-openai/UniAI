@@ -1,72 +1,6 @@
 /** @format */
 
-// spark chat model request interface
-export interface SPKChatRequest {
-    header: {
-        app_id: string
-        uid?: string
-    }
-    parameter: {
-        chat: {
-            domain: string
-            temperature?: number
-            max_tokens?: number
-            top_k?: number
-            chat_id?: number
-        }
-    }
-    payload: {
-        message: {
-            text: SPKChatMessage[]
-        }
-    }
-}
-
-interface SystemMessage {
-    role: 'system'
-    content: string
-}
-interface UserMessage {
-    role: 'user'
-    content: string
-}
-interface AssistantMessage {
-    role: 'assistant'
-    content: string
-}
-
-export type SPKChatMessage = SystemMessage | AssistantMessage | UserMessage
-
-// spark chat model response interface
-export interface SPKChatResponse {
-    header: {
-        code: number
-        message: string
-        sid: string
-        status: number
-    }
-    payload?: {
-        choices?: {
-            status: number
-            seq: number
-            text: [
-                {
-                    content: string
-                    role: string
-                    index: number
-                }
-            ]
-        }
-        usage?: {
-            text: {
-                question_tokens: number
-                prompt_tokens: number
-                completion_tokens: number
-                total_tokens: number
-            }
-        }
-    }
-}
+import { IFlyTekChatModel } from './Enum'
 
 export interface SPKImagineRequest {
     header: {
@@ -118,5 +52,93 @@ export interface SPKImagineResponse {
                 }
             ]
         }
+    }
+}
+
+export interface SPKTool {
+    type: 'function' | 'web_search'
+    function?: FunctionTool
+    web_search?: WebSearchTool
+}
+
+interface FunctionTool {
+    name: string
+    description?: string
+    parameters?: object
+}
+
+interface WebSearchTool {
+    enable?: boolean
+    show_ref_label?: boolean
+}
+
+interface SystemMessage {
+    role: 'system'
+    content: string
+}
+
+interface UserMessage {
+    role: 'user'
+    content: string
+}
+
+interface AssistantMessage {
+    role: 'assistant'
+    content: string
+}
+interface ToolMessage {
+    role: 'tool'
+    content: string
+}
+
+export type SPKChatMessage = SystemMessage | UserMessage | AssistantMessage | ToolMessage
+/**
+ * Request Parameters
+ */
+export interface SparkChatRequest {
+    model: IFlyTekChatModel
+    user?: string // Unique user ID
+    messages: SPKChatMessage[]
+    temperature?: number // Sampling threshold, range [0, 2], default 1.0
+    top_k?: number // Number of candidates to randomly select from, range [1, 6], default 4
+    top_p?: number // Probability threshold for sampling, range (0, 1], default 1
+    presence_penalty?: number // Penalty for repetition, range [-2.0, 2.0], default 0
+    frequency_penalty?: number // Penalty for frequency, range [-2.0, 2.0], default 0
+    stream?: boolean // Whether to stream the response, default false
+    max_tokens?: number // Maximum tokens, range [1, 4096] for Lite/Pro-128K, [1, 8192] for others
+    response_format?: { type: 'text' | 'json_object' }
+    tools?: SPKTool[] // List of tools
+    tool_choice?: SPKToolChoice // Tool invocation strategy
+    suppress_plugin?: string[] // List of disabled plugins
+}
+export type SPKToolChoice = 'auto' | 'none' | 'required'
+
+// ==================== Response Section ====================
+
+/**
+ * Non-Streaming Response
+ */
+export interface SparkChatResponse {
+    code: number // Error code
+    message: string // Error message
+    sid: string // Unique request ID
+    choices: Array<{
+        message?: {
+            role: 'assistant' // Role
+            content: string | null // Content
+            tool_calls?: object[]
+        }
+        delta?: {
+            role: 'assistant' // Role
+            content: string | null // Content
+            tool_calls?: object[]
+        }
+        index: number // Result index
+        finish_reason: string
+    }>
+    usage?: {
+        prompt_tokens: number // Input tokens
+        completion_tokens: number // Output tokens
+        total_tokens: number // Total tokens
     }
 }

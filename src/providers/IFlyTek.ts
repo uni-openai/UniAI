@@ -6,9 +6,16 @@ import { PassThrough, Readable } from 'stream'
 import EventSourceStream from '@server-sent-stream/node'
 import { decodeStream } from 'iconv-lite'
 import { ChatMessage, ChatResponse, TaskResponse } from '../../interface/IModel'
-import { SPKChatMessage, SPKImagineRequest, SPKImagineResponse } from '../../interface/IFlyTek'
+import {
+    SparkChatRequest,
+    SparkChatResponse,
+    SPKChatMessage,
+    SPKImagineRequest,
+    SPKImagineResponse,
+    SPKTool,
+    SPKToolChoice
+} from '../../interface/IFlyTek'
 import { ChatRoleEnum, IFlyTekChatModel, IFlyTekImagineModel, SPKTaskType } from '../../interface/Enum'
-import { GPTChatRequest, GPTChatResponse, GPTChatStreamRequest, GPTChatStreamResponse } from '../../interface/IOpenAI'
 import $ from '../util'
 
 const CHAT_API = 'https://spark-api-open.xf-yun.com'
@@ -52,7 +59,9 @@ export default class IFlyTek {
         stream: boolean = false,
         top?: number,
         temperature?: number,
-        maxLength?: number
+        maxLength?: number,
+        tools?: SPKTool[],
+        toolChoice?: SPKToolChoice
     ) {
         const key = Array.isArray(this.pass) ? $.getRandomKey(this.pass) : this.pass
         if (!key) throw new Error('IFlyTek Spark API Password is not set in config')
@@ -68,7 +77,7 @@ export default class IFlyTek {
             if (temperature > 2) temperature = 2
         }
 
-        const res = await $.post<GPTChatRequest | GPTChatStreamRequest, Readable | GPTChatResponse>(
+        const res = await $.post<SparkChatRequest, Readable | SparkChatResponse>(
             `${this.api}/v1/chat/completions`,
             {
                 model,
@@ -76,7 +85,9 @@ export default class IFlyTek {
                 stream,
                 temperature,
                 top_p: top,
-                max_tokens: maxLength
+                max_tokens: maxLength,
+                tools,
+                tool_choice: toolChoice
             },
             { headers: { Authorization: `Bearer ${key}` }, responseType: stream ? 'stream' : 'json' }
         )
@@ -91,12 +102,14 @@ export default class IFlyTek {
         if (res instanceof Readable) {
             const output = new PassThrough()
             const parser = new EventSourceStream()
+
             parser.on('data', (e: MessageEvent) => {
-                const obj = $.json<GPTChatStreamResponse>(e.data)
-                if (obj?.choices[0].delta?.content) {
-                    data.content = obj.choices[0].delta.content
-                    data.model = obj.model || model
-                    data.object = obj.object || ''
+                const obj = $.json<SparkChatResponse>(e.data)
+                if (obj) {
+                    data.content = obj.choices[0]?.delta?.content || ''
+                    if (obj.choices[0]?.delta?.tool_calls) data.tools = obj.choices[0]?.delta?.tool_calls
+                    data.model = model
+                    data.object = 'chat.completion.chunk'
                     data.promptTokens = obj.usage?.prompt_tokens || 0
                     data.completionTokens = obj.usage?.completion_tokens || 0
                     data.totalTokens = obj.usage?.total_tokens || 0
@@ -110,9 +123,10 @@ export default class IFlyTek {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0].message.content || ''
-            data.model = res.model || model
-            data.object = res.object || ''
+            data.content = res.choices[0]?.message?.content || null
+            if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
+            data.model = model
+            data.object = 'chat.completion'
             data.promptTokens = res.usage?.prompt_tokens || 0
             data.completionTokens = res.usage?.completion_tokens || 0
             data.totalTokens = res.usage?.total_tokens || 0
@@ -210,7 +224,7 @@ export default class IFlyTek {
         const prompt: SPKChatMessage[] = []
 
         for (const { role, content } of messages) {
-            if (role === ChatRoleEnum.DEV || role === ChatRoleEnum.TOOL) continue
+            if (role === ChatRoleEnum.DEV) continue
             prompt.push({ role, content })
         }
 

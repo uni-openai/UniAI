@@ -27,14 +27,14 @@ describe('MoonShot Tests', () => {
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    })
+    }, 60000)
 
     test('Test chat moonshot moonshot-v1-32k', done => {
         uni.chat(input, { provider: ModelProvider.MoonShot, model: MoonShotChatModel.MOON_V1_32K })
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    })
+    }, 60000)
 
     test('Test chat moonshot moonshot-v1-128k stream', done => {
         uni.chat(input, { stream: true, provider: ModelProvider.MoonShot, model: MoonShotChatModel.MOON_V1_128K }).then(

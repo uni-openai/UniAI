@@ -1,6 +1,5 @@
 /** @format */
 
-import jwt from 'jsonwebtoken'
 import { PassThrough, Readable } from 'stream'
 import EventSourceStream from '@server-sent-stream/node'
 import { decodeStream } from 'iconv-lite'
@@ -10,26 +9,21 @@ import {
     GLMChatResponse,
     GLMEmbedRequest,
     GLMEmbedResponse,
-    GLMTokenCache,
-    Tool
+    GLMTool,
+    GLMToolChoice
 } from '../../interface/IGLM'
 import { ChatRoleEnum, GLMChatModel, GLMEmbedModel } from '../../interface/Enum'
 import { ChatMessage, ChatResponse, EmbeddingResponse } from '../../interface/IModel'
 import $ from '../util'
-import { AxiosHeaders } from 'axios'
 
-const EXPIRE = 3 * 60 * 1000
 const API = 'https://open.bigmodel.cn'
-const STORAGE_KEY = 'glm'
 
 export default class GLM {
     private key?: string | string[]
-    private localAPI?: string
     private proxyAPI: string
 
-    constructor(key?: string | string[], localAPI?: string, proxyAPI: string = API) {
+    constructor(key?: string | string[], proxyAPI: string = API) {
         this.key = key
-        this.localAPI = localAPI
         this.proxyAPI = proxyAPI
     }
 
@@ -41,13 +35,14 @@ export default class GLM {
      * @returns A promise resolving to the embedding response.
      */
     async embedding(input: string[], model: GLMEmbedModel = GLMEmbedModel.EMBED_2, dimensions = 1024) {
-        const url = `${this.proxyAPI || API}/api/paas/v4/embeddings`
-        const headers = new AxiosHeaders()
         const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
         if (!key) throw new Error('ZhiPu GLM API key is not set in config')
-        headers['Authorization'] = this.generateToken(key)
 
-        const res = await $.post<GLMEmbedRequest, GLMEmbedResponse>(url, { model, input, dimensions }, { headers })
+        const res = await $.post<GLMEmbedRequest, GLMEmbedResponse>(
+            `${this.proxyAPI}/api/paas/v4/embeddings`,
+            { model, input, dimensions },
+            { headers: { Authorization: `Bearer ${key}` }, responseType: 'json' }
+        )
 
         return {
             embedding: res.data.map(v => v.embedding),
@@ -71,13 +66,13 @@ export default class GLM {
      */
     async chat(
         messages: ChatMessage[],
-        model: GLMChatModel = GLMChatModel.GLM_6B,
+        model: GLMChatModel = GLMChatModel.GLM_3_TURBO,
         stream: boolean = false,
         top?: number,
         temperature?: number,
         maxLength?: number,
-        tools?: Tool[],
-        toolChoice?: 'auto'
+        tools?: GLMTool[],
+        toolChoice?: GLMToolChoice
     ) {
         // filter images
         if (![GLMChatModel.GLM_4V, GLMChatModel.GLM_4V_PLUS].includes(model))
@@ -104,20 +99,11 @@ export default class GLM {
         }
 
         // ZhiPu GLM official API
-        let url = `${this.proxyAPI}/api/paas/v4/chat/completions`
-        const headers = new AxiosHeaders()
-        if ([GLMChatModel.GLM_6B, GLMChatModel.GLM_9B].includes(model)) {
-            // use local deployed open source GLM API, 6B and 9B
-            if (!this.localAPI) throw new Error('Local GLM API is not set in config')
-            url = `${this.localAPI}/chat`
-        } else {
-            const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
-            if (!key) throw new Error('ZhiPu GLM API key is not set in config')
-            headers['Authorization'] = this.generateToken(key)
-        }
+        const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
+        if (!key) throw new Error('ZhiPu GLM API key is not set in config')
 
         const res = await $.post<GLMChatRequest, Readable | GLMChatResponse>(
-            url,
+            `${this.proxyAPI}/api/paas/v4/chat/completions`,
             {
                 model,
                 messages: this.formatMessage(messages),
@@ -128,8 +114,9 @@ export default class GLM {
                 tools,
                 tool_choice: toolChoice
             },
-            { headers, responseType: stream ? 'stream' : 'json' }
+            { headers: { Authorization: `Bearer ${key}` }, responseType: stream ? 'stream' : 'json' }
         )
+
         if (res instanceof Readable) {
             const output = new PassThrough()
             const parser = new EventSourceStream()
@@ -137,8 +124,8 @@ export default class GLM {
             parser.on('data', (e: MessageEvent) => {
                 const obj = $.json<GLMChatResponse>(e.data)
                 if (obj) {
-                    data.content = obj.choices[0].delta?.content || ''
-                    data.tools = obj.choices[0].delta?.tool_calls
+                    data.content = obj.choices[0]?.delta?.content || ''
+                    if (obj.choices[0]?.delta?.tool_calls) data.tools = obj.choices[0]?.delta?.tool_calls
                     data.model = obj.model
                     data.object = obj.object || 'chat.completion.chunk'
                     data.promptTokens = obj.usage?.prompt_tokens || 0
@@ -154,8 +141,8 @@ export default class GLM {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0].message?.content || ''
-            data.tools = res.choices[0].message?.tool_calls
+            data.content = res.choices[0]?.message?.content || null
+            if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
             data.model = res.model
             data.object = res.object || 'chat.completion'
             data.promptTokens = res.usage?.prompt_tokens || 0
@@ -163,30 +150,6 @@ export default class GLM {
             data.totalTokens = res.usage?.total_tokens || 0
             return data
         }
-    }
-
-    /**
-     * Generates a JWT token for authorization.
-     *
-     * @param key - The API key.
-     * @param expire - Token expiration time in milliseconds.
-     * @returns The generated JWT token.
-     */
-    private generateToken(key: string, expire: number = EXPIRE) {
-        const [id, secret] = key.split('.')
-        const timestamp = Date.now()
-
-        // check existed token cache
-        const cache = $.getItem<GLMTokenCache>(STORAGE_KEY)
-        if (cache && timestamp - cache.timestamp < expire) return cache.token
-
-        /// @ts-ignore
-        const token = jwt.sign({ api_key: id, timestamp, exp: timestamp + expire }, secret, {
-            header: { alg: 'HS256', sign_type: 'SIGN' }
-        })
-
-        $.setItem(STORAGE_KEY, { token, timestamp })
-        return token
     }
 
     /**

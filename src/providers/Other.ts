@@ -105,11 +105,14 @@ export default class Other {
 
             parser.on('data', (e: MessageEvent) => {
                 const obj = $.json<GPTChatStreamResponse>(e.data)
-                if (obj?.choices[0]?.delta?.content) {
-                    data.content = obj.choices[0].delta.content
-                    data.tools = obj.choices[0].delta.tool_calls
-                    data.model = obj.model
-                    data.object = obj.object
+                if (obj) {
+                    data.content = obj.choices[0]?.delta?.content || ''
+                    if (obj.choices[0]?.delta?.tool_calls) data.tools = obj.choices[0]?.delta?.tool_calls
+                    data.model = obj.model || model
+                    data.object = obj.object || 'chat.completion.chunk'
+                    data.promptTokens = obj.usage?.prompt_tokens || 0
+                    data.completionTokens = obj.usage?.completion_tokens || 0
+                    data.totalTokens = obj.usage?.total_tokens || 0
                     output.write(JSON.stringify(data))
                 }
             })
@@ -119,10 +122,10 @@ export default class Other {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0].message.content || ''
-            data.tools = res.choices[0].message.tool_calls
-            data.model = res.model
-            data.object = res.object
+            data.content = res.choices[0]?.message?.content || null
+            if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
+            data.model = res.model || model
+            data.object = res.object || 'chat.completion'
             data.promptTokens = res.usage?.prompt_tokens || 0
             data.completionTokens = res.usage?.completion_tokens || 0
             data.totalTokens = res.usage?.total_tokens || 0

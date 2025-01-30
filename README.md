@@ -65,17 +65,17 @@ English · [🇨🇳 中文说明](./README_CN.md)
 
 Latest update: we have supported **OpenAI's O1** models!
 
--   [IFLYTEK/Spark](https://xinghuo.xfyun.cn)
--   [THUDM/ChatGLM-6B](https://github.com/THUDM/ChatGLM4)
--   [ZHIPU/GLM3-4](https://open.bigmodel.cn)
--   [OpenAI/GPT](https://platform.openai.com)
--   [Baidu/WenXin Workshop](https://cloud.baidu.com/product/wenxinworkshop)
--   [Google/Gemini](https://makersuite.google.com/app/)
--   [MoonShot/moonshot](https://platform.moonshot.cn/docs)
--   [OpenAI/DALL-E](https://platform.openai.com)
--   [AliYun/QianWen](https://help.aliyun.com/zh/model-studio)
--   [MidJourney Proxy](https://github.com/novicezk/midjourney-proxy)
--   [Stability AI](https://platform.stability.ai/docs/getting-started)
+- [IFLYTEK/Spark](https://xinghuo.xfyun.cn)
+- [THUDM/ChatGLM-6B](https://github.com/THUDM/ChatGLM4)
+- [ZHIPU/GLM3-4](https://open.bigmodel.cn)
+- [OpenAI/GPT](https://platform.openai.com)
+- [Baidu/WenXin Workshop](https://cloud.baidu.com/product/wenxinworkshop)
+- [Google/Gemini](https://makersuite.google.com/app/)
+- [MoonShot/moonshot](https://platform.moonshot.cn/docs)
+- [OpenAI/DALL-E](https://platform.openai.com)
+- [AliYun/QianWen](https://help.aliyun.com/zh/model-studio)
+- [MidJourney Proxy](https://github.com/novicezk/midjourney-proxy)
+- [Stability AI](https://platform.stability.ai/docs/getting-started)
 
 ## Applications Developed on UniAI
 
@@ -100,7 +100,7 @@ yarn add uniai
 **Using npm:**
 
 ```bash
-npm install uniai
+npm install uniai --save
 ```
 
 ## Example
@@ -176,12 +176,12 @@ console.log(res)
 const input = [
     {
         role: 'user',
-        content: 'Describe this picture, is it a man or a woman, and what is she doing?',
-        img: 'https://pics7.baidu.com/feed/1f178a82b9014a903fcc22f1e98d931fb11bee90.jpeg@f_auto?token=d5a33ea74668787d60d6f61c7b8f9ca2'
+        content: 'Describe the image',
+        img: 'https://img2.baidu.com/it/u=2595743336,2138195985&fm=253&fmt=auto?w=801&h=800'
     }
 ]
 // Warn: If you choose a non-image model, img attributes will be dropped!
-const res = await ai.chat(input, { model: 'gpt-4-vision-preview' })
+const res = await ai.chat(input, { model: 'gpt-4o' })
 console.log(res)
 ```
 

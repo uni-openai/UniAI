@@ -29,20 +29,13 @@ export interface EmbeddingResponse {
 }
 
 export interface ChatResponse {
-    content: string
+    content: string | null
+    tools?: object[]
     promptTokens: number
     completionTokens: number
     totalTokens: number
     model: ChatModel | string
     object: string
-    tools?: {
-        id?: string
-        function?: {
-            arguments?: string
-            name?: string
-        }
-        type?: string
-    }[]
 }
 
 export interface ChatOption {

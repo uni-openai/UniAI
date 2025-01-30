@@ -1,7 +1,7 @@
 /** @format */
 import 'dotenv/config'
 import '../env.d.ts'
-import UniAI, { ChatMessage } from '../src'
+import UniAI, { ChatMessage, ChatResponse } from '../src'
 import {
     ChatModelProvider,
     ChatRoleEnum,
@@ -156,7 +156,7 @@ describe('OpenAI tests', () => {
             model: OpenAIChatModel.GPT_4O_MINI,
             tools
         })
-            .then(r => console.log(JSON.stringify(r)))
+            .then(r => console.log((r as ChatResponse).tools))
             .catch(console.error)
             .finally(done)
     }, 60000)

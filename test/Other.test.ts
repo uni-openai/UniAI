@@ -1,7 +1,7 @@
 /** @format */
 import 'dotenv/config'
 import '../env.d.ts'
-import UniAI, { ChatMessage } from '../src'
+import UniAI, { ChatMessage, ChatResponse } from '../src'
 import {
     ChatModelProvider,
     ChatRoleEnum,
@@ -24,12 +24,9 @@ const input2: ChatMessage[] = [
     }
 ]
 
-let uni: UniAI
-
-beforeAll(() => (uni = new UniAI({ Other: { api: GLM_API } })))
-
 describe('Other Tests', () => {
     test('Test list Other models', () => {
+        const uni = new UniAI()
         const provider = uni.models.filter(v => v.value === EmbedModelProvider.Other)[0]
         console.log(provider)
         expect(provider.provider).toEqual('Other')
@@ -52,7 +49,7 @@ describe('Other Tests', () => {
             .finally(done)
     }, 60000)
 
-    test('Test chat openai OpenAI O1', done => {
+    test('Test chat other GPT O1 mini', done => {
         const uni = new UniAI({ Other: { api: OTHER_API, key: OTHER_KEY } })
         uni.chat(input, { stream: false, provider: ChatModelProvider.Other, model: OpenAIChatModel.O1_MINI })
             .then(console.log)
@@ -60,7 +57,7 @@ describe('Other Tests', () => {
             .finally(done)
     }, 60000)
 
-    test('Test chat openai gpt-4o-mini stream', done => {
+    test('Test chat other openai gpt-4o-mini stream', done => {
         const uni = new UniAI({ Other: { api: OTHER_API, key: OTHER_KEY } })
         uni.chat(input2, {
             stream: true,
@@ -77,7 +74,55 @@ describe('Other Tests', () => {
         })
     }, 60000)
 
+    test('Test chat local deployed glm-4-9b-chat stream', done => {
+        const uni = new UniAI({ Other: { api: GLM_API } })
+        uni.chat(input, { stream: true, provider: ChatModelProvider.Other, model: 'glm-4-9b-chat' }).then(res => {
+            expect(res).toBeInstanceOf(Readable)
+            const stream = res as Readable
+            let data = ''
+            stream.on('data', chunk => (data += JSON.parse(chunk.toString()).content))
+            stream.on('end', () => console.log(data))
+            stream.on('error', e => console.error(e))
+            stream.on('close', () => done())
+        })
+    }, 60000)
+
+    test('Test chat local deployed glm-4-9b-chat with tools', done => {
+        const uni = new UniAI({ Other: { api: GLM_API } })
+        const tools = [
+            {
+                type: 'function',
+                function: {
+                    name: 'get_weather',
+                    description: 'Get current temperature for a given location.',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            location: {
+                                type: 'string',
+                                description: 'City and country e.g. Bogotá, Colombia, should in English'
+                            }
+                        },
+                        required: ['location'],
+                        additionalProperties: false
+                    },
+                    strict: true
+                }
+            }
+        ]
+        uni.chat('今天澳门天气如何？', {
+            stream: false,
+            provider: ChatModelProvider.Other,
+            model: 'glm-4-9b-chat',
+            tools
+        })
+            .then(r => console.log((r as ChatResponse).tools))
+            .catch(console.error)
+            .finally(done)
+    }, 60000)
+
     test('Test Other text2vec-large-chinese embedding', done => {
+        const uni = new UniAI({ Other: { api: GLM_API } })
         uni.embedding([input, input], { provider: ModelProvider.Other, model: OtherEmbedModel.LARGE_CHN })
             .then(res => expect(res.embedding.length).toBe(2))
             .catch(console.error)

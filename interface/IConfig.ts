@@ -16,7 +16,6 @@ export interface UniAIConfig {
     // GLM configs
     GLM?: {
         key?: string | string[]
-        local?: string
         proxy?: string
     }
 
@@ -44,11 +43,6 @@ export interface UniAIConfig {
     AliYun?: {
         key: string | string[]
         proxy?: string
-    }
-
-    // stable diffusion (local)
-    StableDiffusion?: {
-        api: string
     }
 
     // midjourney proxy

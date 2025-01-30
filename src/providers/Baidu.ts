@@ -85,8 +85,9 @@ export default class Baidu {
             const parser = new EventSourceStream()
             parser.on('data', (e: MessageEvent<string>) => {
                 const obj = $.json<BaiduChatResponse>(e.data)
-                if (obj?.result) {
-                    data.content = obj.result
+                if (obj) {
+                    data.content = obj.result || ''
+                    data.model = model
                     data.object = obj.object
                     data.promptTokens = obj.usage?.prompt_tokens || 0
                     data.completionTokens = obj.usage?.completion_tokens || 0
@@ -102,7 +103,8 @@ export default class Baidu {
             return output as Readable
         } else {
             if (res.error_code) throw new Error(res.error_msg)
-            data.content = res.result
+            data.content = res.result || null
+            data.model = model
             data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0
             data.completionTokens = res.usage?.completion_tokens || 0

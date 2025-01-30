@@ -1,7 +1,7 @@
 /** @format */
 import 'dotenv/config'
 import '../env.d.ts'
-import UniAI, { ChatMessage } from '../src'
+import UniAI, { ChatMessage, ChatResponse } from '../src'
 import { ModelProvider, IFlyTekChatModel, ChatModelProvider, ChatRoleEnum } from '../interface/Enum'
 import { Readable } from 'stream'
 
@@ -73,10 +73,11 @@ describe('IFlyTek Tests', () => {
     })
 
     test('Test chat IFlyTek spark max stream', done => {
-        uni.chat('查询最近5天苏州的气温，绘制成折线图', {
+        uni.chat('查询最近5天苏州的气温', {
             stream: true,
             provider: ChatModelProvider.IFlyTek,
-            model: IFlyTekChatModel.SPARK_MAX
+            model: IFlyTekChatModel.SPARK_MAX,
+            tools: [{ type: 'web_search', web_search: { enable: true } }]
         }).then(res => {
             expect(res).toBeInstanceOf(Readable)
             const stream = res as Readable
@@ -92,7 +93,8 @@ describe('IFlyTek Tests', () => {
         uni.chat('查询最近5天苏州的气温，用ECharts代码绘制成折线图', {
             stream: true,
             provider: ChatModelProvider.IFlyTek,
-            model: IFlyTekChatModel.SPARK_ULTRA
+            model: IFlyTekChatModel.SPARK_ULTRA,
+            tools: [{ type: 'web_search', web_search: { enable: true } }]
         }).then(res => {
             expect(res).toBeInstanceOf(Readable)
             const stream = res as Readable
@@ -102,5 +104,41 @@ describe('IFlyTek Tests', () => {
             stream.on('error', e => console.error(e))
             stream.on('close', () => done())
         })
+    }, 60000)
+
+    test('Test chat IFlyTek spark ultra with tools', done => {
+        const tools = [
+            {
+                type: 'function',
+                function: {
+                    name: 'get_current_weather',
+                    description: '返回实时天气',
+                    parameters: {
+                        type: 'object',
+                        properties: {
+                            location: {
+                                type: 'string',
+                                description: '河北省承德市双桥区'
+                            },
+                            format: {
+                                type: 'string',
+                                enum: ['celsius', 'fahrenheit'],
+                                description: '使用本地区常用的温度单位计量'
+                            }
+                        },
+                        required: ['location', 'format']
+                    }
+                }
+            }
+        ]
+        uni.chat('今天澳门天气如何？', {
+            stream: false,
+            provider: ChatModelProvider.IFlyTek,
+            model: IFlyTekChatModel.SPARK_ULTRA,
+            tools
+        })
+            .then(r => console.log((r as ChatResponse).tools))
+            .catch(console.error)
+            .finally(done)
     }, 60000)
 })

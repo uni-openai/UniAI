@@ -84,10 +84,13 @@ export default class MoonShot {
             const parser = new EventSourceStream()
             parser.on('data', (e: MessageEvent) => {
                 const obj = $.json<GPTChatStreamResponse>(e.data)
-                if (obj?.choices[0].delta?.content) {
-                    data.content = obj.choices[0].delta.content
+                if (obj) {
+                    data.content = obj.choices[0]?.delta?.content || ''
                     data.model = obj.model
                     data.object = obj.object
+                    data.promptTokens = obj.usage?.prompt_tokens || 0
+                    data.completionTokens = obj.usage?.completion_tokens || 0
+                    data.totalTokens = obj.usage?.total_tokens || 0
                     output.write(JSON.stringify(data))
                 }
             })
@@ -98,7 +101,7 @@ export default class MoonShot {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0].message.content || ''
+            data.content = res.choices[0].message.content || null
             data.model = res.model
             data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0

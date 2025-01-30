@@ -13,9 +13,12 @@ export interface GLMChatRequest {
     request_id?: string
     do_sample?: boolean
     stop?: string[]
-    tools?: Tool[]
-    tool_choice?: 'auto'
+    tools?: GLMTool[]
+    tool_choice?: GLMToolChoice
 }
+
+export type GLMToolChoice = 'auto'
+
 export interface GLMEmbedRequest {
     model: GLMEmbedModel
     input: string | string[]
@@ -73,7 +76,7 @@ interface ToolMessage {
 
 export type GLMChatMessage = SystemMessage | UserMessage | AssistantMessage | ToolMessage
 
-export interface Tool {
+export interface GLMTool {
     type: 'function' | 'retrieval' | 'web_search'
     function?: FunctionTool
     retrieval?: RetrievalTool
@@ -123,14 +126,7 @@ interface Choice {
 interface Message {
     role: 'assistant'
     content: string | null
-    tool_calls?: {
-        function: {
-            name: string
-            arguments: string
-        }
-        id: string
-        type: 'function'
-    }[]
+    tool_calls?: object[]
 }
 
 interface Usage {
@@ -145,9 +141,4 @@ interface WebSearch {
     link: string
     media: string
     content: string
-}
-
-export interface GLMTokenCache {
-    token: string
-    timestamp: number
 }

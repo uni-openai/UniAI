@@ -95,8 +95,8 @@ export default class AliYun {
             const parser = new EventSourceStream()
             parser.on('data', (e: MessageEvent) => {
                 const obj = $.json<GPTChatStreamResponse>(e.data)
-                if (obj?.choices[0].delta?.content) {
-                    data.content = obj.choices[0].delta.content
+                if (obj) {
+                    data.content = obj?.choices[0]?.delta?.content || ''
                     data.model = obj.model
                     data.object = obj.object
                     data.promptTokens = obj.usage?.prompt_tokens || 0

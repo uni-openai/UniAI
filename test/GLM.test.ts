@@ -1,7 +1,7 @@
 /** @format */
 import 'dotenv/config'
 import '../env.d.ts'
-import UniAI, { ChatMessage } from '../src'
+import UniAI, { ChatMessage, ChatResponse } from '../src'
 import {
     ModelProvider,
     GLMChatModel,
@@ -12,13 +12,13 @@ import {
 } from '../interface/Enum'
 import { Readable } from 'stream'
 
-const { GLM_API, ZHIPU_AI_API, ZHIPU_AI_KEY } = process.env
+const { ZHIPU_AI_API, ZHIPU_AI_KEY } = process.env
 
 const input = 'Hi, who are you? Answer in 10 words!'
 
 let uni: UniAI
 
-beforeAll(() => (uni = new UniAI({ GLM: { key: ZHIPU_AI_KEY.split(','), proxy: ZHIPU_AI_API, local: GLM_API } })))
+beforeAll(() => (uni = new UniAI({ GLM: { key: ZHIPU_AI_KEY.split(','), proxy: ZHIPU_AI_API } })))
 
 describe('GLM Tests', () => {
     test('Test list GLM models', () => {
@@ -27,13 +27,6 @@ describe('GLM Tests', () => {
         expect(provider.provider).toEqual('GLM')
         expect(provider.models.length).toEqual(Object.values(GLMChatModel).length)
         expect(provider.value).toEqual(ModelProvider.GLM)
-    })
-
-    test('Test chat local chatglm3-6b', done => {
-        uni.chat(input, { provider: ChatModelProvider.GLM, model: GLMChatModel.GLM_6B })
-            .then(console.log)
-            .catch(console.error)
-            .finally(done)
     })
 
     test('Test chat ZhiPu glm-3-turbo', done => {
@@ -110,7 +103,12 @@ describe('GLM Tests', () => {
     })
 
     test('Test chat ZhiPu glm-4-long', done => {
-        uni.chat('今天新闻头条有哪些报道，总结下', { provider: ChatModelProvider.GLM, model: GLMChatModel.GLM_4_LONG })
+        const tools = [{ type: 'web_search', web_search: { enable: true, search_result: true } }]
+        uni.chat('今天农历是多少？新闻头条有哪些报道，总结下', {
+            tools,
+            provider: ChatModelProvider.GLM,
+            model: GLMChatModel.GLM_4_LONG
+        })
             .then(console.log)
             .catch(console.error)
             .finally(done)
@@ -194,7 +192,7 @@ describe('GLM Tests', () => {
             model: GLMChatModel.GLM_4,
             tools
         })
-            .then(r => console.log(JSON.stringify(r)))
+            .then(r => console.log((r as ChatResponse).tools))
             .catch(console.error)
             .finally(done)
     }, 60000)

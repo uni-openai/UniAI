@@ -38,7 +38,8 @@ import MidJourney from './providers/MidJourney'
 import Stability from './providers/Stability'
 import AliYun from './providers/AliYun'
 import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resources'
-import { Tool } from '../interface/IGLM'
+import { GLMTool, GLMToolChoice } from '../interface/IGLM'
+import { SPKTool, SPKToolChoice } from '../interface/IFlyTek'
 
 const DEFAULT_MESSAGE = 'Hi, who are you? Answer in 10 words!'
 
@@ -65,7 +66,7 @@ export default class UniAI {
         // OpenAI key, your OpenAI proxy API (optional)
         this.openai = new OpenAI(config.OpenAI?.key, config.OpenAI?.proxy)
         // ZhiPu AI with ChatGLM6B(local)
-        this.glm = new GLM(config.GLM?.key, config.GLM?.local, config.GLM?.proxy)
+        this.glm = new GLM(config.GLM?.key, config.GLM?.proxy)
         // Google AI key, your Google AI API proxy (optional)
         this.google = new Google(config.Google?.key, config.Google?.proxy)
         // IFlyTek appid, API key, API secret
@@ -128,9 +129,9 @@ export default class UniAI {
             models: Object.values<EmbedModel>(
                 {
                     [EmbedModelProvider.OpenAI]: OpenAIEmbedModel,
-                    [EmbedModelProvider.Other]: OtherEmbedModel,
                     [EmbedModelProvider.GLM]: GLMEmbedModel,
-                    [EmbedModelProvider.Google]: GoogleEmbedModel
+                    [EmbedModelProvider.Google]: GoogleEmbedModel,
+                    [EmbedModelProvider.Other]: OtherEmbedModel
                 }[v]
             )
         }))
@@ -164,11 +165,20 @@ export default class UniAI {
                 top,
                 temperature,
                 maxLength,
-                tools as Tool[],
-                toolChoice as 'auto'
+                tools as GLMTool[],
+                toolChoice as GLMToolChoice
             )
         else if (provider === ChatModelProvider.IFlyTek)
-            return await this.fly.chat(messages, model as IFlyTekChatModel, stream, top, temperature, maxLength)
+            return await this.fly.chat(
+                messages,
+                model as IFlyTekChatModel,
+                stream,
+                top,
+                temperature,
+                maxLength,
+                tools as SPKTool[],
+                toolChoice as SPKToolChoice
+            )
         else if (provider === ChatModelProvider.Baidu)
             return await this.baidu.chat(messages, model as BaiduChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.MoonShot)
