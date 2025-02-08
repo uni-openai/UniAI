@@ -105,8 +105,9 @@ npm install uniai --save
 
 ## Example
 
-> We have written a simple call demo for you, which is placed in the `/examples` folder. You can read the `/examples` file directly to learn how to use UniAI.
-> You can also read on to learn how to use UniAI based on the documentation.
+We have written some simple call demos for you, which is placed in the [/examples](./example/) folder. You can read the example files directly to learn how to use **UniAI**.
+
+You can also read on to learn how to use **UniAI** based on this documentation.
 
 ### List Models
 
@@ -139,7 +140,7 @@ console.log(ai.models)
         "value": "openai",
         "models": ["gpt-3.5-turbo", "gpt-4o", "chatgpt-4o-latest", "gpt-4o-mini", "gpt-4-turbo", "gpt-4"]
     }
-    // ...providers and models
+    // ...other providers and models
 ]
 ```
 
@@ -147,7 +148,7 @@ console.log(ai.models)
 
 To interact with a model, use `.chat()` and remember to provide the **required API key** or **secret** parameters when initializing `new UniAI()`.
 
-Default model is **OpenAI/gpt-3.5-turbo**, put the _OpenAI key_ and your _proxy API_.
+Default model is **OpenAI/gpt-4o**, put the _OpenAI key_ and your _proxy API_.
 
 ```typescript
 const key: string | string[] = 'Your OpenAI Key (required), support multi keys'
@@ -246,7 +247,7 @@ yarn test OpenAI
 
 [Weilong Yu](https://github.com/mrkk1)
 
-huangyw@iict.ac.cn
+devilyouwei@foxmail.com
 
 ## Who is using it
 

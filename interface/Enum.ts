@@ -4,6 +4,7 @@
 
 export enum ChatModelProvider {
     OpenAI = 'openai',
+    DeepSeek = 'deepseek',
     IFlyTek = 'iflytek',
     Baidu = 'baidu',
     Google = 'google',
@@ -39,6 +40,7 @@ export enum OpenAIEmbedModel {
 
 // local embedding models
 export enum OtherEmbedModel {
+    BGE_M3 = 'bge-m3',
     BASE_CHN = 'text2vec-base-chinese',
     LARGE_CHN = 'text2vec-large-chinese',
     BASE_CHN_PARAPH = 'text2vec-base-chinese-paraphrase',
@@ -61,15 +63,21 @@ export const EmbedModel = { ...OpenAIEmbedModel, ...OtherEmbedModel, ...GLMEmbed
 
 // openai chat models
 export enum OpenAIChatModel {
-    GPT3 = 'gpt-3.5-turbo',
     GPT_4O = 'gpt-4o',
-    CHAT_GPT_4O = 'chatgpt-4o-latest',
     GPT_4O_MINI = 'gpt-4o-mini',
+    CHAT_GPT_4O = 'chatgpt-4o-latest',
+    GPT4_TURBO = 'gpt-4-turbo',
+    GPT4 = 'gpt-4',
     O1 = 'o1',
     O1_PRE = 'o1-preview',
     O1_MINI = 'o1-mini',
-    GPT4_TURBO = 'gpt-4-turbo',
-    GPT4 = 'gpt-4'
+    O3_MINI = 'o3-mini',
+    GPT3 = 'gpt-3.5-turbo'
+}
+
+export enum DeepSeekChatModel {
+    DEEPSEEK_V3 = 'deepseek-chat',
+    DEEPSEEK_R1 = 'deepseek-reasoner'
 }
 
 // google chat models
@@ -148,6 +156,7 @@ export enum AliChatModel {
 // All chat models
 export type ChatModel =
     | OpenAIChatModel
+    | DeepSeekChatModel
     | BaiduChatModel
     | GLMChatModel
     | IFlyTekChatModel
@@ -158,6 +167,7 @@ export type ChatModel =
 
 export const ChatModel = {
     ...OpenAIChatModel,
+    ...DeepSeekChatModel,
     ...BaiduChatModel,
     ...GLMChatModel,
     ...IFlyTekChatModel,
@@ -238,6 +248,14 @@ export enum GPTChatRoleEnum {
     TOOL = 'tool'
 }
 
+// DeepSeek model roles
+export enum DSChatRoleEnum {
+    SYSTEM = 'system',
+    USER = 'user',
+    ASSISTANT = 'assistant',
+    TOOL = 'tool'
+}
+
 // IflyTek Spark model roles
 export enum SPKChatRoleEnum {
     USER = 'user',
@@ -251,7 +269,6 @@ export enum GLMChatRoleEnum {
     SYSTEM = 'system',
     USER = 'user',
     ASSISTANT = 'assistant',
-    OBSERVATION = 'observation',
     TOOL = 'tool'
 }
 

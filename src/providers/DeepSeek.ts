@@ -3,21 +3,14 @@
 import { PassThrough, Readable } from 'stream'
 import EventSourceStream from '@server-sent-stream/node'
 import { decodeStream } from 'iconv-lite'
-import { ChatRoleEnum, AliChatModel } from '../../interface/Enum'
+import { ChatRoleEnum, DeepSeekChatModel } from '../../interface/Enum'
 import { ChatMessage, ChatResponse } from '../../interface/IModel'
-import {
-    GPTChatMessage,
-    GPTChatRequest,
-    GPTChatResponse,
-    GPTChatStreamRequest,
-    GPTChatStreamResponse
-} from '../../interface/IOpenAI'
 import $ from '../util'
+import { DSChatMessage, DSChatRequest, DSChatResponse } from '../../interface/IDeepSeek'
 
-const API = 'https://dashscope.aliyuncs.com'
-const VER = 'v1'
+const API = 'https://api.deepseek.com'
 
-export default class AliYun {
+export default class DeepSeek {
     private key?: string | string[]
     private api?: string
 
@@ -44,7 +37,7 @@ export default class AliYun {
      */
     async chat(
         messages: ChatMessage[],
-        model: AliChatModel = AliChatModel.QWEN_TURBO,
+        model: DeepSeekChatModel = DeepSeekChatModel.DEEPSEEK_V3,
         stream: boolean = false,
         top?: number,
         temperature?: number,
@@ -53,12 +46,17 @@ export default class AliYun {
         // if (!Object.values(AliChatModel).includes(model)) throw new Error('Qian Wen chat model not found')
 
         const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
-        if (!key) throw new Error('Qian Wen API key is not set in config')
+        if (!key) throw new Error('DeepSeek API key is not set in config')
+
+        if (typeof maxLength === 'number') {
+            if (maxLength < 1) maxLength = 1
+            if (maxLength > 8192) maxLength = 8192
+        }
 
         // temperature is float in [0,1]
         if (typeof temperature === 'number') {
             if (temperature < 0) temperature = 0
-            if (temperature >= 2) temperature = 1.9
+            if (temperature > 2) temperature = 2
         }
         // top is float in [0,1]
         if (typeof top === 'number') {
@@ -66,12 +64,8 @@ export default class AliYun {
             if (top > 1) top = 1.0
         }
 
-        // remove imgs for not vision model
-        if (![AliChatModel.QWEN_VL_MAX, AliChatModel.QWEN_VL_PLUS].includes(model))
-            messages = messages.map(({ role, content }) => ({ role, content }))
-
-        const res = await $.post<GPTChatRequest | GPTChatStreamRequest, Readable | GPTChatResponse>(
-            `${this.api}/compatible-mode/${VER}/chat/completions`,
+        const res = await $.post<DSChatRequest, Readable | DSChatResponse>(
+            `${this.api}/chat/completions`,
             {
                 model,
                 messages: this.formatMessage(messages),
@@ -82,6 +76,7 @@ export default class AliYun {
             },
             { headers: { Authorization: `Bearer ${key}` }, responseType: stream ? 'stream' : 'json' }
         )
+
         const data: ChatResponse = {
             content: '',
             model,
@@ -90,13 +85,15 @@ export default class AliYun {
             completionTokens: 0,
             totalTokens: 0
         }
+
         if (res instanceof Readable) {
             const output = new PassThrough()
             const parser = new EventSourceStream()
+
             parser.on('data', (e: MessageEvent) => {
-                const obj = $.json<GPTChatStreamResponse>(e.data)
+                const obj = $.json<DSChatResponse>(e.data)
                 if (obj) {
-                    data.content = obj?.choices[0]?.delta?.content || ''
+                    data.content = obj.choices[0]?.delta?.content || ''
                     data.model = obj.model
                     data.object = obj.object
                     data.promptTokens = obj.usage?.prompt_tokens || 0
@@ -105,7 +102,6 @@ export default class AliYun {
                     output.write(JSON.stringify(data))
                 }
             })
-
             parser.on('error', e => output.destroy(e))
             parser.on('end', () => output.end())
 
@@ -115,7 +111,7 @@ export default class AliYun {
             data.content = res.choices[0]?.message?.content || ''
             if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
             data.model = res.model
-            data.object = res.object || 'chat.completion'
+            data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0
             data.completionTokens = res.usage?.completion_tokens || 0
             data.totalTokens = res.usage?.total_tokens || 0
@@ -130,24 +126,13 @@ export default class AliYun {
      * @returns Formatted messages compatible with the GPT model.
      */
     private formatMessage(messages: ChatMessage[]) {
-        const prompt: GPTChatMessage[] = []
+        const prompt: DSChatMessage[] = []
 
-        for (const { role, content, img } of messages) {
-            // GPT not support function role
-            if (role === ChatRoleEnum.TOOL || role === ChatRoleEnum.DEV) continue
-
-            // with image
-            if (img) {
-                if (!img.startsWith('http')) throw new Error('Invalid img HTTP URL')
-                prompt.push({
-                    role: 'user',
-                    content: [
-                        { type: 'text', text: content },
-                        { type: 'image_url', image_url: { url: img } }
-                    ]
-                })
-            }
-            // only text
+        for (const { role, content, tool } of messages) {
+            // DeepSeek not support develop role
+            if (role === ChatRoleEnum.DEV) continue
+            else if (role === ChatRoleEnum.TOOL) prompt.push({ role, content, tool_call_id: tool! })
+            // DeepSeek not support image, only text
             else prompt.push({ role, content })
         }
 

@@ -9,8 +9,7 @@
 import { decodeStream } from 'iconv-lite'
 import { PassThrough, Readable } from 'stream'
 import EventSourceStream from '@server-sent-stream/node'
-import { OtherEmbedRequest, OtherEmbedResponse } from '../../interface/IOther'
-import { ChatModel, ChatRoleEnum, OtherEmbedModel } from '../../interface/Enum'
+import { ChatModel, ChatRoleEnum, EmbedModel } from '../../interface/Enum'
 import { ChatMessage, ChatResponse, EmbeddingResponse } from '../../interface/IModel'
 import $ from '../util'
 import {
@@ -18,7 +17,9 @@ import {
     GPTChatRequest,
     GPTChatResponse,
     GPTChatStreamRequest,
-    GPTChatStreamResponse
+    GPTChatStreamResponse,
+    OpenAIEmbedRequest,
+    OpenAIEmbedResponse
 } from '../../interface/IOpenAI'
 import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resources'
 
@@ -38,17 +39,30 @@ export default class Other {
     }
 
     /**
-     * Fetches embeddings for a prompt.
+     * Fetches embeddings for input text.
      *
-     * @param prompt - An array of input prompts.
-     * @param model - The type of the embed model (default is OtherEmbedModel.LARGE_CHN).
+     * @param input - An array of input strings.
+     * @param model - The model to use for embeddings (default: text-embedding-ada-002).
      * @returns A promise resolving to the embedding response.
      */
-    async embedding(prompt: string[], model: OtherEmbedModel = OtherEmbedModel.LARGE_CHN): Promise<EmbeddingResponse> {
+    async embedding(input: string[], model: EmbedModel = EmbedModel.BGE_M3) {
         if (!this.api) throw new Error('Other embed model API is not set in config')
+        const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
 
-        const res = await $.post<OtherEmbedRequest, OtherEmbedResponse>(`${this.api}/embedding`, { prompt, model })
-        return { embedding: res.data, model, object: 'embedding', promptTokens: 0, totalTokens: 0 } as EmbeddingResponse
+        const res = await $.post<OpenAIEmbedRequest, OpenAIEmbedResponse>(
+            `${this.api}/v1/embeddings`,
+            { model, input },
+            { headers: { Authorization: `Bearer ${key}` }, responseType: 'json' }
+        )
+
+        const data: EmbeddingResponse = {
+            embedding: res.data.map(v => v.embedding),
+            object: 'embedding',
+            model,
+            promptTokens: res.usage.prompt_tokens || 0,
+            totalTokens: res.usage.total_tokens || 0
+        }
+        return data
     }
 
     /**
@@ -122,7 +136,7 @@ export default class Other {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0]?.message?.content || null
+            data.content = res.choices[0]?.message?.content || ''
             if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
             data.model = res.model || model
             data.object = res.object || 'chat.completion'

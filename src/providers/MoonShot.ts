@@ -101,7 +101,7 @@ export default class MoonShot {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0].message.content || null
+            data.content = res.choices[0]?.message?.content || ''
             data.model = res.model
             data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0

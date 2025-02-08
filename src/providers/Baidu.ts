@@ -103,7 +103,7 @@ export default class Baidu {
             return output as Readable
         } else {
             if (res.error_code) throw new Error(res.error_msg)
-            data.content = res.result || null
+            data.content = res.result || ''
             data.model = model
             data.object = res.object
             data.promptTokens = res.usage?.prompt_tokens || 0

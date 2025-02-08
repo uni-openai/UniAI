@@ -74,7 +74,7 @@ describe('Other Tests', () => {
         })
     }, 60000)
 
-    test('Test chat local deployed glm-4-9b-chat stream', done => {
+    test('Test chat local deployed model in stream', done => {
         const uni = new UniAI({ Other: { api: GLM_API } })
         uni.chat(input, { stream: true, provider: ChatModelProvider.Other, model: 'glm-4-9b-chat' }).then(res => {
             expect(res).toBeInstanceOf(Readable)
@@ -87,7 +87,8 @@ describe('Other Tests', () => {
         })
     }, 60000)
 
-    test('Test chat local deployed glm-4-9b-chat with tools', done => {
+    // not support
+    test('Test chat local deployed model with tools', done => {
         const uni = new UniAI({ Other: { api: GLM_API } })
         const tools = [
             {
@@ -124,6 +125,22 @@ describe('Other Tests', () => {
     test('Test Other text2vec-large-chinese embedding', done => {
         const uni = new UniAI({ Other: { api: GLM_API } })
         uni.embedding([input, input], { provider: ModelProvider.Other, model: OtherEmbedModel.LARGE_CHN })
+            .then(res => {
+                console.log(res)
+                return res
+            })
+            .then(res => expect(res.embedding.length).toBe(2))
+            .catch(console.error)
+            .finally(done)
+    })
+
+    test('Test Other bge-m3 embedding', done => {
+        const uni = new UniAI({ Other: { api: GLM_API } })
+        uni.embedding([input, input], { provider: ModelProvider.Other, model: OtherEmbedModel.BGE_M3 })
+            .then(res => {
+                console.log(res)
+                return res
+            })
             .then(res => expect(res.embedding.length).toBe(2))
             .catch(console.error)
             .finally(done)

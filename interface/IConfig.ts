@@ -7,6 +7,12 @@ export interface UniAIConfig {
         proxy?: string
     }
 
+    // DeepSeek configs
+    DeepSeek?: {
+        key: string | string[]
+        proxy?: string
+    }
+
     // Google configs
     Google?: {
         key: string | string[]

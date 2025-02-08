@@ -123,7 +123,7 @@ export default class IFlyTek {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0]?.message?.content || null
+            data.content = res.choices[0]?.message?.content || ''
             if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
             data.model = model
             data.object = 'chat.completion'

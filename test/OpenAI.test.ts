@@ -42,16 +42,16 @@ describe('OpenAI tests', () => {
         expect(provider.value).toEqual(ModelProvider.OpenAI)
     })
 
-    test('Test chat openai default, gpt-3.5-turbo', done => {
-        uni.chat().then(console.log).catch(console.error).finally(done)
-    })
+    test('Test chat openai default, gpt-4o', done => {
+        uni.chat(input2).then(console.log).catch(console.error).finally(done)
+    }, 60000)
 
-    test('Test chat openai gpt-4o', done => {
-        uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O })
+    test('Test chat openai gpt-3.5-turbo', done => {
+        uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT3 })
             .then(console.log)
             .catch(console.error)
             .finally(done)
-    }, 60000)
+    })
 
     test('Test chat openai gpt-4o-mini', done => {
         uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.GPT_4O_MINI })
@@ -105,10 +105,10 @@ describe('OpenAI tests', () => {
             stream.on('error', e => console.error(e))
             stream.on('close', () => done())
         })
-    }, 10000)
+    }, 60000)
 
     test('Test chat openai o1-preview', done => {
-        uni.chat(input, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PRE }).then(
+        uni.chat(input3, { stream: true, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_PRE }).then(
             res => {
                 expect(res).toBeInstanceOf(Readable)
                 const stream = res as Readable
@@ -119,10 +119,17 @@ describe('OpenAI tests', () => {
                 stream.on('close', () => done())
             }
         )
-    }, 10000)
+    }, 60000)
 
     test('Test chat openai o1-mini', done => {
         uni.chat(input, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O1_MINI })
+            .then(console.log)
+            .catch(console.error)
+            .finally(done)
+    }, 60000)
+
+    test('Test chat openai o3-mini', done => {
+        uni.chat(input2, { stream: false, provider: ChatModelProvider.OpenAI, model: OpenAIChatModel.O3_MINI })
             .then(console.log)
             .catch(console.error)
             .finally(done)

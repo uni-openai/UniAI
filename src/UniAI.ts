@@ -5,6 +5,7 @@ import {
     ChatModel,
     ChatModelProvider,
     ChatRoleEnum,
+    DeepSeekChatModel,
     EmbedModel,
     EmbedModelProvider,
     GLMChatModel,
@@ -40,6 +41,7 @@ import AliYun from './providers/AliYun'
 import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resources'
 import { GLMTool, GLMToolChoice } from '../interface/IGLM'
 import { SPKTool, SPKToolChoice } from '../interface/IFlyTek'
+import DeepSeek from './providers/DeepSeek'
 
 const DEFAULT_MESSAGE = 'Hi, who are you? Answer in 10 words!'
 
@@ -51,6 +53,7 @@ export default class UniAI {
     public imgModels: ModelList
 
     private openai: OpenAI
+    private deepseek: DeepSeek
     private google: Google
     private glm: GLM
     private fly: IFlyTek
@@ -65,6 +68,8 @@ export default class UniAI {
         this.config = config
         // OpenAI key, your OpenAI proxy API (optional)
         this.openai = new OpenAI(config.OpenAI?.key, config.OpenAI?.proxy)
+        // DeepSeek Key
+        this.deepseek = new DeepSeek(config.DeepSeek?.key, config.DeepSeek?.proxy)
         // ZhiPu AI with ChatGLM6B(local)
         this.glm = new GLM(config.GLM?.key, config.GLM?.proxy)
         // Google AI key, your Google AI API proxy (optional)
@@ -97,6 +102,7 @@ export default class UniAI {
             models: Object.values<ChatModel>(
                 {
                     [ChatModelProvider.OpenAI]: OpenAIChatModel,
+                    [ChatModelProvider.DeepSeek]: DeepSeekChatModel,
                     [ChatModelProvider.Baidu]: BaiduChatModel,
                     [ChatModelProvider.IFlyTek]: IFlyTekChatModel,
                     [ChatModelProvider.GLM]: GLMChatModel,
@@ -155,6 +161,8 @@ export default class UniAI {
                 tools as ChatCompletionTool[],
                 toolChoice as ChatCompletionToolChoiceOption
             )
+        else if (provider === ChatModelProvider.DeepSeek)
+            return await this.deepseek.chat(messages, model as DeepSeekChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.Google)
             return await this.google.chat(messages, model as GoogleChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.GLM)

@@ -89,7 +89,7 @@ export default class OpenAI {
      */
     async chat(
         messages: ChatMessage[],
-        model: OpenAIChatModel = OpenAIChatModel.GPT3,
+        model: OpenAIChatModel = OpenAIChatModel.GPT_4O,
         stream: boolean = false,
         top?: number,
         temperature?: number,
@@ -174,7 +174,7 @@ export default class OpenAI {
             res.pipe(decodeStream('utf-8')).pipe(parser)
             return output as Readable
         } else {
-            data.content = res.choices[0]?.message?.content || null
+            data.content = res.choices[0]?.message?.content || ''
             if (res.choices[0]?.message?.tool_calls) data.tools = res.choices[0]?.message?.tool_calls
             data.model = res.model
             data.object = res.object

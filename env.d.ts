@@ -20,6 +20,8 @@ declare global {
             MOONSHOT_KEY: string
             ALI_KEY: string
             ALI_API: string
+            DS_API: string
+            DS_KEY: string
             STABLE_DIFFUSION_API: string
             MID_JOURNEY_API: string
             MID_JOURNEY_TOKEN: string
