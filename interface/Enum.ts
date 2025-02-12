@@ -18,6 +18,7 @@ export enum EmbedModelProvider {
     OpenAI = 'openai',
     Google = 'google',
     GLM = 'glm',
+    AliYun = 'aliyun',
     Other = 'other'
 }
 
@@ -58,8 +59,22 @@ export enum GoogleEmbedModel {
     EMBED_4 = 'text-embedding-004'
 }
 
-export type EmbedModel = OpenAIEmbedModel | OtherEmbedModel | GLMEmbedModel | GoogleEmbedModel
-export const EmbedModel = { ...OpenAIEmbedModel, ...OtherEmbedModel, ...GLMEmbedModel, ...GoogleEmbedModel }
+export enum AliEmbedModel {
+    V3 = 'text-embedding-v3',
+    V2 = 'text-embedding-v2',
+    V1 = 'text-embedding-v1',
+    ASYNC_V2 = 'text-embedding-async-v2',
+    ASYNC_V1 = 'text-embedding-async-v1'
+}
+
+export type EmbedModel = OpenAIEmbedModel | OtherEmbedModel | GLMEmbedModel | GoogleEmbedModel | AliEmbedModel
+export const EmbedModel = {
+    ...OpenAIEmbedModel,
+    ...OtherEmbedModel,
+    ...GLMEmbedModel,
+    ...GoogleEmbedModel,
+    ...AliEmbedModel
+}
 
 // openai chat models
 export enum OpenAIChatModel {

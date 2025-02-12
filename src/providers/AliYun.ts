@@ -3,14 +3,16 @@
 import { PassThrough, Readable } from 'stream'
 import EventSourceStream from '@server-sent-stream/node'
 import { decodeStream } from 'iconv-lite'
-import { ChatRoleEnum, AliChatModel } from '../../interface/Enum'
-import { ChatMessage, ChatResponse } from '../../interface/IModel'
+import { ChatRoleEnum, AliChatModel, AliEmbedModel } from '../../interface/Enum'
+import { ChatMessage, ChatResponse, EmbeddingResponse } from '../../interface/IModel'
 import {
     GPTChatMessage,
     GPTChatRequest,
     GPTChatResponse,
     GPTChatStreamRequest,
-    GPTChatStreamResponse
+    GPTChatStreamResponse,
+    OpenAIEmbedRequest,
+    OpenAIEmbedResponse
 } from '../../interface/IOpenAI'
 import $ from '../util'
 
@@ -22,13 +24,40 @@ export default class AliYun {
     private api?: string
 
     /**
-     * Constructor for MoonShot class.
+     * Constructor for AliYun class.
      * @param key - The API key for MoonShot.
      * @param api - The API endpoint for proxy (optional).
      */
     constructor(key?: string | string[], api: string = API) {
         this.key = key
         this.api = api
+    }
+
+    /**
+     * Fetches embeddings for input text.
+     *
+     * @param input - An array of input strings.
+     * @param model - The model to use for embeddings (default: text-embedding-v3).
+     * @returns A promise resolving to the embedding response.
+     */
+    async embedding(input: string[], model: AliEmbedModel = AliEmbedModel.V3, dimensions = 1024) {
+        const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
+        if (!key) throw new Error('AliYun API key is not set in config')
+
+        const res = await $.post<OpenAIEmbedRequest, OpenAIEmbedResponse>(
+            `${this.api}/compatible-mode/${VER}/embeddings`,
+            { model, input, dimensions },
+            { headers: { Authorization: `Bearer ${key}` }, responseType: 'json' }
+        )
+
+        const data: EmbeddingResponse = {
+            embedding: res.data.map(v => v.embedding),
+            object: 'embedding',
+            model,
+            promptTokens: res.usage.prompt_tokens || 0,
+            totalTokens: res.usage.total_tokens || 0
+        }
+        return data
     }
 
     /**

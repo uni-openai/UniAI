@@ -1,6 +1,7 @@
 /** @format */
 import {
     AliChatModel,
+    AliEmbedModel,
     BaiduChatModel,
     ChatModel,
     ChatModelProvider,
@@ -137,6 +138,7 @@ export default class UniAI {
                     [EmbedModelProvider.OpenAI]: OpenAIEmbedModel,
                     [EmbedModelProvider.GLM]: GLMEmbedModel,
                     [EmbedModelProvider.Google]: GoogleEmbedModel,
+                    [EmbedModelProvider.AliYun]: AliEmbedModel,
                     [EmbedModelProvider.Other]: OtherEmbedModel
                 }[v]
             )
@@ -218,6 +220,8 @@ export default class UniAI {
             return await this.glm.embedding(content, model as GLMEmbedModel, option.dimensions)
         else if (provider === EmbedModelProvider.Google)
             return await this.google.embedding(content, model as GoogleEmbedModel)
+        else if (provider === EmbedModelProvider.AliYun)
+            return await this.ali.embedding(content, model as AliEmbedModel, option.dimensions)
         else if (provider === EmbedModelProvider.Other)
             return await this.other.embedding(content, model as OtherEmbedModel)
         else throw new Error('Embedding model provider not found')
