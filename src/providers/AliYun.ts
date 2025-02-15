@@ -38,9 +38,10 @@ export default class AliYun {
      *
      * @param input - An array of input strings.
      * @param model - The model to use for embeddings (default: text-embedding-v3).
+     * @param dimensions - The dimensions of output embedding vector (default: 1024)
      * @returns A promise resolving to the embedding response.
      */
-    async embedding(input: string[], model: AliEmbedModel = AliEmbedModel.V3, dimensions = 1024) {
+    async embedding(input: string[], model: AliEmbedModel = AliEmbedModel.ALI_V3, dimensions = 1024) {
         const key = Array.isArray(this.key) ? $.getRandomKey(this.key) : this.key
         if (!key) throw new Error('AliYun API key is not set in config')
 
@@ -61,7 +62,7 @@ export default class AliYun {
     }
 
     /**
-     * Sends messages to the Ali QianWen chat model.
+     * Sends messages to the AliYun LLMs.
      *
      * @param messages - An array of chat messages.
      * @param model - The model to use for chat (default: moonshot-v1-8k).

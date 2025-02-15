@@ -60,11 +60,11 @@ export enum GoogleEmbedModel {
 }
 
 export enum AliEmbedModel {
-    V3 = 'text-embedding-v3',
-    V2 = 'text-embedding-v2',
-    V1 = 'text-embedding-v1',
-    ASYNC_V2 = 'text-embedding-async-v2',
-    ASYNC_V1 = 'text-embedding-async-v1'
+    ALI_V3 = 'text-embedding-v3',
+    ALI_V2 = 'text-embedding-v2',
+    ALI_V1 = 'text-embedding-v1',
+    ALI_ASYNC_V2 = 'text-embedding-async-v2',
+    ALI_ASYNC_V1 = 'text-embedding-async-v1'
 }
 
 export type EmbedModel = OpenAIEmbedModel | OtherEmbedModel | GLMEmbedModel | GoogleEmbedModel | AliEmbedModel
@@ -100,8 +100,12 @@ export enum GoogleChatModel {
     GEM_PRO_1_5 = 'gemini-1.5-pro',
     GEM_FLASH_1_5 = 'gemini-1.5-flash',
     GEM_FLASH_1_5_8B = 'gemini-1.5-flash-8b',
-    GEM_FLASH_2_EXP = 'gemini-2.0-flash-exp',
-    GEM_FLASH_2_THINK_EXP = 'gemini-2.0-flash-thinking-exp'
+    GEM_FLASH_2 = 'gemini-2.0-flash',
+    GEM_FLASH_2_LITE = 'gemini-2.0-flash-lite-preview',
+    // experimental
+    GEM_PRO_2 = 'gemini-2.0-pro-exp',
+    GEM_FLASH_2_THINK_EXP = 'gemini-2.0-flash-thinking-exp',
+    LEARNLM_PRO_1_5 = 'learnlm-1.5-pro-experimental'
 }
 
 // glm chat models
