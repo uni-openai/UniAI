@@ -1,6 +1,6 @@
 {
     "name": "uniai",
-    "version": "1.12.2",
+    "version": "1.12.3",
     "author": "devilyouwei",
     "description": "To unify AI models!",
     "repository": "https://github.com/uniai-lab/uniai",
@@ -14,13 +14,12 @@
         "GPT",
         "Gemini",
         "Moonshot",
-        "QWen",
+        "Qian Wen",
         "GLM",
-        "StabilityAI",
-        "Midjourney",
         "DeepSeek",
-        "星火大模型",
-        "文心一言"
+        "Grok",
+        "StabilityAI",
+        "Midjourney"
     ],
     "scripts": {
         "build": "tsup",

@@ -22,6 +22,8 @@ declare global {
             ALI_API: string
             DS_API: string
             DS_KEY: string
+            X_AI_API: string
+            X_AI_KEY: string
             STABLE_DIFFUSION_API: string
             MID_JOURNEY_API: string
             MID_JOURNEY_TOKEN: string

@@ -63,6 +63,11 @@ export interface UniAIConfig {
         proxy?: string
     }
 
+    XAI?: {
+        key: string | string[]
+        proxy?: string
+    }
+
     // other models
     Other?: {
         api?: string

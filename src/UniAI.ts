@@ -25,7 +25,8 @@ import {
     OpenAIEmbedModel,
     OpenAIImagineModel,
     OtherEmbedModel,
-    StabilityAIImagineModel
+    StabilityAIImagineModel,
+    XAIChatModel
 } from '../interface/Enum'
 import { UniAIConfig } from '../interface/IConfig'
 import { ChatMessage, ChatOption, EmbedOption, ImagineOption, ModelList, Provider } from '../interface/IModel'
@@ -43,6 +44,8 @@ import { ChatCompletionTool, ChatCompletionToolChoiceOption } from 'openai/resou
 import { GLMTool, GLMToolChoice } from '../interface/IGLM'
 import { SPKTool, SPKToolChoice } from '../interface/IFlyTek'
 import DeepSeek from './providers/DeepSeek'
+import XAI from './providers/IX'
+import { GrokTool, GrokToolChoice } from '../interface/IX'
 
 const DEFAULT_MESSAGE = 'Hi, who are you? Answer in 10 words!'
 
@@ -63,6 +66,7 @@ export default class UniAI {
     private moon: MoonShot
     private ali: AliYun
     private mj: MidJourney
+    private xai: XAI
     private stability: Stability
 
     constructor(config: UniAIConfig = {}) {
@@ -89,6 +93,8 @@ export default class UniAI {
         this.moon = new MoonShot(config.MoonShot?.key, config.MoonShot?.proxy)
         // AliYun, QWen API key
         this.ali = new AliYun(config.AliYun?.key, config.AliYun?.proxy)
+        // XAI Grok, XAI API key
+        this.xai = new XAI(config.XAI?.key, config.XAI?.proxy)
         // Other model text2vec
         this.other = new Other(config.Other?.api, config.Other?.key)
         // Midjourney, proxy
@@ -110,6 +116,7 @@ export default class UniAI {
                     [ChatModelProvider.Google]: GoogleChatModel,
                     [ChatModelProvider.MoonShot]: MoonShotChatModel,
                     [ChatModelProvider.AliYun]: AliChatModel,
+                    [ChatModelProvider.XAI]: XAIChatModel,
                     [ChatModelProvider.Other]: []
                 }[v]
             )
@@ -195,6 +202,17 @@ export default class UniAI {
             return await this.moon.chat(messages, model as MoonShotChatModel, stream, top, temperature, maxLength)
         else if (provider === ChatModelProvider.AliYun)
             return await this.ali.chat(messages, model as AliChatModel, stream, top, temperature, maxLength)
+        else if (provider === ChatModelProvider.XAI)
+            return await this.xai.chat(
+                messages,
+                model as XAIChatModel,
+                stream,
+                top,
+                temperature,
+                maxLength,
+                tools as GrokTool[],
+                toolChoice as GrokToolChoice
+            )
         else if (provider === ChatModelProvider.Other)
             return await this.other.chat(
                 messages,

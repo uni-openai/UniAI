@@ -11,6 +11,7 @@ export enum ChatModelProvider {
     GLM = 'glm',
     MoonShot = 'moonshot',
     AliYun = 'aliyun',
+    XAI = 'xai',
     Other = 'other'
 }
 
@@ -172,6 +173,13 @@ export enum AliChatModel {
     QWEN_VL_PLUS = 'qwen-vl-plus'
 }
 
+export enum XAIChatModel {
+    GROK2 = 'grok-2',
+    GROK2_VISION = 'grok-2-vision',
+    GROK3 = 'grok-3',
+    GROK3_VISION = 'grok-3-vision'
+}
+
 // All chat models
 export type ChatModel =
     | OpenAIChatModel
@@ -182,6 +190,7 @@ export type ChatModel =
     | GoogleChatModel
     | MoonShotChatModel
     | AliChatModel
+    | XAIChatModel
     | string
 
 export const ChatModel = {
@@ -193,7 +202,8 @@ export const ChatModel = {
     ...GoogleChatModel,
     ...OpenAIChatModel,
     ...MoonShotChatModel,
-    ...AliChatModel
+    ...AliChatModel,
+    ...XAIChatModel
 }
 
 // image models

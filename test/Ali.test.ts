@@ -118,7 +118,7 @@ describe('AliYun QWen Tests', () => {
     test('Test Ali/text-embedding-v3 embedding', done => {
         uni.embedding([input, input + 'sss'], {
             provider: EmbedModelProvider.AliYun,
-            model: AliEmbedModel.V3,
+            model: AliEmbedModel.ALI_V3,
             dimensions: 512
         })
             .then(res => {
@@ -132,7 +132,7 @@ describe('AliYun QWen Tests', () => {
     test.only('Test Ali/text-embedding-v2 embedding', done => {
         uni.embedding([input, input + 'sss'], {
             provider: EmbedModelProvider.AliYun,
-            model: AliEmbedModel.V2,
+            model: AliEmbedModel.ALI_V2,
             dimensions: 768
         })
             .then(res => {
