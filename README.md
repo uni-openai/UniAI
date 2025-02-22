@@ -5,7 +5,8 @@
 <h3 align="center">To Unify AI Models!</h3>
 
 <p>
-UniAI is a library integrated with multiple generative-AI models. It provides a unified interface for different models, streamlining the development process by ensuring a consistent model input and output.
+UniAI is a library integrated with multiple cutting-edge generative-AI models.
+It provides a unified interface for different models, streamlining the development process by ensuring a consistent model input and output.
 </p>
 
 <h3 align=center>Chat</h3>
@@ -54,26 +55,31 @@ English · [🇨🇳 中文说明](./README_CN.md)
 
 ## Supported Models
 
-<p align="left">
-<img src="./icon/xunfei.png" width="45px">
+<p>
 <img src="./icon/openai.png" width="45px">
 <img src="./icon/google.png" width="45px">
+<img src="./icon/xai.png" width="45px">
 <img src="./icon/zhipu.png" width="45px">
-<img src="./icon/baidu.png" width="45px">
+<img src="./icon/glm.png" width="45px">
+<img src="./icon/xunfei.png" width="45px">
+<img src="./icon/qwen.png" width="45px">
 <img src="./icon/moon.png" width="45px">
+<img src="./icon/baidu.png" width="45px">
 </p>
 
-Latest update: we have supported **OpenAI's O1** models!
+Latest update: we have supported **OpenAI's O1** and **DeepSeek** models!
 
-- [IFLYTEK/Spark](https://xinghuo.xfyun.cn)
-- [THUDM/ChatGLM-6B](https://github.com/THUDM/ChatGLM4)
-- [ZHIPU/GLM3-4](https://open.bigmodel.cn)
+- [DeepSeek](https://api-docs.deepseek.com/)
 - [OpenAI/GPT](https://platform.openai.com)
-- [Baidu/WenXin Workshop](https://cloud.baidu.com/product/wenxinworkshop)
 - [Google/Gemini](https://makersuite.google.com/app/)
-- [MoonShot/moonshot](https://platform.moonshot.cn/docs)
-- [OpenAI/DALL-E](https://platform.openai.com)
+- [IFLYTEK/Spark](https://xinghuo.xfyun.cn)
+- [THUDM/ChatGLM](https://github.com/THUDM/ChatGLM4)
+- [ZHIPU/GLM3-4](https://open.bigmodel.cn)
+- [MoonShot](https://platform.moonshot.cn/docs)
 - [AliYun/QianWen](https://help.aliyun.com/zh/model-studio)
+- [Baidu/WenXin Workshop](https://cloud.baidu.com/product/wenxinworkshop)
+- [OpenAI/DALL-E](https://platform.openai.com)
+- [X AI Grok](https://docs.x.ai/docs/overview)
 - [MidJourney Proxy](https://github.com/novicezk/midjourney-proxy)
 - [Stability AI](https://platform.stability.ai/docs/getting-started)
 
@@ -105,9 +111,11 @@ npm install uniai --save
 
 ## Example
 
-We have written some simple call demos for you, which is placed in the [/examples](./example/) folder. You can read the example files directly to learn how to use **UniAI**.
+We have written some simple call demos for you, which is placed in the [examples](./example/) folder. You can read the example files directly to learn how to use **UniAI**.
 
 You can also read on to learn how to use **UniAI** based on this documentation.
+
+You can set up environment variables by referring to the [dotenv example](./.env.example)
 
 ### List Models
 
@@ -247,8 +255,6 @@ yarn test OpenAI
 
 [Weilong Yu](https://github.com/mrkk1)
 
-devilyouwei@foxmail.com
-
 ## Who is using it
 
 |                        Project                         |                                          Brief introduction                                           |
@@ -264,5 +270,3 @@ devilyouwei@foxmail.com
 ## License
 
 [MIT](./LICENSE)
-
-Copyright (c) 2022-present, Youwei Huang
